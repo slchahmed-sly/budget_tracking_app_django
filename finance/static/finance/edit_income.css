@@ -1,0 +1,243 @@
+/* --- 1. The Container --- */
+body {
+    background-color: #f3f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1f2937;
+    margin: 0;
+    padding: 20px;
+}
+
+.form-panel {
+    background: white;
+    max-width: 550px;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    /* Green Top for Income */
+    border-top: 8px solid #10b981;
+}
+
+.panel-header h2 {
+    margin: 0;
+    color: #111827;
+}
+
+.panel-header p {
+    margin: 5px 0 25px 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* --- 2. Inputs --- */
+.form-group {
+    margin-bottom: 24px;
+}
+
+.field-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #f9fafb;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+input:focus,
+textarea:focus {
+    border-color: #10b981;
+    background-color: white;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.main-amount {
+    flex: 2;
+}
+
+.secondary-amount {
+    flex: 1;
+}
+
+.main-amount input {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #065f46;
+    padding: 15px;
+}
+
+.secondary-amount small {
+    display: block;
+    margin-top: 4px;
+    color: #9ca3af;
+    font-size: 0.75rem;
+}
+
+/* --- 3. Status Cards --- */
+.status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.status-option {
+    position: relative;
+}
+
+.status-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.status-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 5px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.status-card .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-bottom: 8px;
+    background-color: #d1d5db;
+}
+
+.status-card:hover {
+    border-color: #d1d5db;
+    background-color: #f9fafb;
+}
+
+input[type="radio"]:checked+.status-card {
+    background-color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Colors */
+input[value="certain"]:checked+.status-card {
+    border-color: #10b981;
+    color: #065f46;
+}
+
+input[value="certain"]:checked+.status-card .dot {
+    background-color: #10b981;
+}
+
+input[value="probable"]:checked+.status-card {
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+input[value="probable"]:checked+.status-card .dot {
+    background-color: #f59e0b;
+}
+
+input[value="uncertain"]:checked+.status-card {
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+input[value="uncertain"]:checked+.status-card .dot {
+    background-color: #ef4444;
+}
+
+/* --- 4. Actions --- */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.checkbox-group input {
+    width: auto;
+}
+
+.form-actions {
+    margin-top: 30px;
+}
+
+.btn-save {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #10b981;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-save:hover {
+    background-color: #059669;
+}
+
+.btn-cancel {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.btn-cancel:hover {
+    color: #1f2937;
+}
+
+/* --- 5. DELETE SECTION (New) --- */
+.delete-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    /* Divider line */
+    text-align: center;
+}
+
+.btn-delete {
+    color: #ef4444;
+    /* Red Text */
+    font-size: 0.9rem;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #fef2f2;
+    /* Light red background on hover */
+    text-decoration: underline;
+}

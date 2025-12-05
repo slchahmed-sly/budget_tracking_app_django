@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Deletion{% endblock %}
+
+{% block css_styling %}
+<link rel="stylesheet" href="{% static 'dashboard.css' %}">
+<style>
+    .confirm-card {
+        max-width: 500px;
+        margin: 60px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border-top: 8px solid #ef4444; /* Warning Red */
+    }
+    .warning-icon { font-size: 40px; margin-bottom: 20px; display: block; }
+    h2 { color: #1f2937; margin-bottom: 10px; }
+    p { color: #6b7280; font-size: 1.1rem; margin-bottom: 30px; }
+    
+    .actions { display: flex; gap: 15px; justify-content: center; }
+    
+    .btn-danger {
+        background-color: #ef4444; color: white; border: none;
+        padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer;
+        font-size: 1rem;
+    }
+    .btn-danger:hover { background-color: #dc2626; }
+
+    .btn-safe {
+        background-color: #e5e7eb; color: #374151; text-decoration: none;
+        padding: 12px 24px; border-radius: 8px; font-weight: bold;
+        display: inline-block;
+    }
+    .btn-safe:hover { background-color: #d1d5db; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="confirm-card">
+    <span class="warning-icon">⚠️</span>
+    <h2>Delete this {{ type }}?</h2>
+    
+    <p>
+        Are you sure you want to remove 
+        <strong style="color:#111827">{{ obj.source }}{{ obj.purpose }}</strong>? 
+        <br>
+        This cannot be undone.
+    </p>
+
+    <div class="actions">
+        <a href="javascript:history.back()" class="btn-safe">Cancel</a>
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn-danger">Yes, Delete it</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,48 +1,118 @@
-{% extends 'base.html'%}
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %} DashBoard {% endblock %}
+{% block title %}Dashboard | My Ledger{% endblock %}
 
 {% block css_styling %}
-
+    <link rel="stylesheet" href="{% static 'finance/dashboard.css' %}">
 {% endblock %}
-
-
-
 
 {% block content %}
 
-
-<h1 style='color:green'> Incomes<h1>
-    {% for income in incomes %}
+<div class="health-bar-container">
+    <div class="stat-box">
+        <span class="label">Balance</span>
+        <span class="value">{{ budget }} <small style="font-size:0.6em;">TL</small></span>
+    </div>
     
-    <h4>{{income.source}} | amout : {{income.amount_tl}}</h4>
+    <div class="stat-box main-stat">
+        <span class="label">Daily Allowance</span>
+        <span class="value">{{ daily_allowance }}</span>
+    </div>
+
+    <div class="stat-box">
+        <span class="label">Days Left</span>
+        <span class="value">{{ remaining_days }}</span>
+    </div>
+</div>
+
+<div class="ledger-grid">
     
-    {% endfor %}
-    <h2>{{total_incomes}}</h2>
+    <div class="ledger-column">
+        <div class="panel-card income-panel">
+            <div class="panel-header">
+                <h3>Income</h3>
+                <span class="total">+{{ total_incomes }} TL</span>
+            </div>
+            
+            <div class="transaction-list">
+                {% for income in incomes %}
+                <a href="{% url 'edit_income' income.pk %}" class="list-row {{ income.status }}">
+                    <div class="row-left">
+                        <div class="title">{{ income.source }}</div>
+                        {% if income.comment %}
+                            <div class="comment-preview">{{ income.comment|truncatechars:25 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="row-right">
+                        <span class="amount">+{{ income.amount_tl }}</span>
+                        {% if income.owe_me %}
+                            <span class="debt-badge">🤝</span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% empty %}
+                <div class="empty-state">No income recorded yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 
+    <div class="ledger-column">
+        <div class="panel-card expense-panel">
+            <div class="panel-header">
+                <h3>Expenses</h3>
+                <span class="total">-{{ total_expenses }} TL</span>
+            </div>
 
+            <div class="transaction-list">
+                {% for expense in expenses %}
+                <a href="{% url 'edit_expense' expense.pk %}" class="list-row expense-row">
+                    <div class="row-left">
+                        <div class="title">{{ expense.purpose }}</div>
+                        {% if expense.comment %}
+                            <div class="comment-preview">{{ expense.comment|truncatechars:25 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="row-right">
+                        <span class="amount">-{{ expense.amount_tl }}</span>
+                        {% if expense.i_owe %}
+                            <span class="debt-badge">🤝</span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% empty %}
+                <div class="empty-state">No expenses yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 
-<h1 style='color:red'> Expenses<h1>
-{% for expense in expenses %}
+</div>
 
-    <h4>{{expense.purpose}} | amout : {{expense.amount_tl}}</h4>
+<div class="fab-container">
+    <div class="fab-options">
+        <a href="{% url 'add_expense' %}" class="fab-option option-expense">
+            <span>Exp</span>
+        </a>
+        <a href="{% url 'add_income' %}" class="fab-option option-income">
+            <span>Inc</span>
+        </a>
+    </div>
     
-    {% endfor %}
-    <h2>{{total_expenses}}</h2>
+    <div class="fab-main">
+        <span>+</span>
+    </div>
+</div>
 
+<script>
+    // Simple script to toggle the menu on Click/Tap instead of Hover
+    const fab = document.querySelector('.fab-container');
+    
+    fab.addEventListener('click', function() {
+        // This toggles the 'active' class on and off
+        fab.classList.toggle('active');
+    });
+</script>
 
-
-<h1 style='color:yellow'> Specials<h1>
-{% for special in specials %}
-
-    <h4>{{special.purpose}} | amout : {{special.amount_tl}}</h4>
-        
-    {% endfor %}
-    <h2>{{total_specials}}</h2>
-
-<h1 style='color:purple'> Budget<h1>
-<h4>{{budget}}</h4>
-
-
-<h1> You can spend {{daily_allowance}} for the rest of the month</h1>
-{% endblock  %}
+{% endblock %}

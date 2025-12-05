@@ -16,14 +16,24 @@ class RecurringExpenseForm(forms.ModelForm):
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = models.Expense
-        fields = '__all__'
+        exclude = ['cycle']
+        widgets = {
+            # This is the Magic Line: Turn the dropdown into Radio Buttons
+            'status': forms.RadioSelect, 
+            'comment': forms.Textarea(attrs={'rows': 3}),
+        }
 
 
 
 class IncomeForm(forms.ModelForm):
     class Meta:
         model = models.Income
-        fields = '__all__'
+        exclude = ['cycle']
+        widgets = {
+            # This is the Magic Line: Turn the dropdown into Radio Buttons
+            'status': forms.RadioSelect, 
+            'comment': forms.Textarea(attrs={'rows': 3}),
+        }
 
 class SpecialForm(forms.ModelForm):
     class Meta:

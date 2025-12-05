@@ -52,11 +52,26 @@ class BaseTransaction(models.Model):
             raise ValidationError("You must provide either MRU or TL amount.")
 
     def save(self, *args, **kwargs):
-        # The logic lives in ONE place now.
-        if self.amount_mru:
-            self.amount_tl = int(round(self.amount_mru / self.cycle.mru_to_tl))
-        elif self.amount_tl:
-            self.amount_mru = int(round(self.amount_tl * self.cycle.mru_to_tl))
+       
+        if self.pk:
+          
+            old_record = self.__class__.objects.get(pk=self.pk)
+            
+            if self.amount_tl != old_record.amount_tl:
+                
+                self.amount_mru = int(round(self.amount_tl * self.cycle.mru_to_tl))
+            
+            elif self.amount_mru != old_record.amount_mru:
+                
+                self.amount_tl = int(round(self.amount_mru / self.cycle.mru_to_tl))
+            
+        else:
+            
+            if self.amount_mru and not self.amount_tl:
+                self.amount_tl = int(round(self.amount_mru / self.cycle.mru_to_tl))
+            elif self.amount_tl:
+                self.amount_mru = int(round(self.amount_tl * self.cycle.mru_to_tl))
+        
         super().save(*args, **kwargs)
 
 
@@ -66,7 +81,6 @@ class BaseTransaction(models.Model):
 
 class Expense(BaseTransaction):
     purpose = models.CharField(max_length=100)
-    status = models.CharField(max_length=50 , choices=STATUS_CHOICES, default='certain')
     i_owe = models.BooleanField(default=False)
 
     def __str__(self):

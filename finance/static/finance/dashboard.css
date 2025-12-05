@@ -1,0 +1,368 @@
+/* --- 1. GLOBAL FOUNDATION --- */
+body {
+    background-color: #f3f4f6;
+    /* Clean light gray background */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1f2937;
+    /* Dark gray text is easier to read than black */
+    margin: 0;
+    padding-bottom: 100px;
+    /* Space for FAB at bottom */
+}
+
+/* --- 2. HEALTH BAR (Professional Dark Mode) --- */
+.health-bar-container {
+    background-color: #111827;
+    /* Deep Charcoal/Black */
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-box {
+    text-align: center;
+    padding: 0 15px;
+}
+
+.stat-box .label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    /* Muted gray label */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.stat-box .value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.stat-box small {
+    font-size: 0.5em;
+    opacity: 0.7;
+    font-weight: 400;
+}
+
+/* The Daily Allowance "Gold" Highlight */
+.main-stat .value {
+    font-size: 2.5rem;
+    color: #fbbf24;
+    /* Amber/Gold */
+    font-weight: 700;
+}
+
+/* --- 3. LAYOUT GRID --- */
+.ledger-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Two equal columns */
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+    .ledger-grid {
+        grid-template-columns: 1fr;
+        /* Stack on mobile */
+    }
+}
+
+/* --- 4. MASTER PANELS (The Cards) --- */
+.panel-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    /* Keeps content inside rounded corners */
+    border-top: 6px solid #ccc;
+    /* Default border thickness */
+}
+
+/* Panel Identifiers */
+.income-panel {
+    border-top-color: #10b981;
+}
+
+/* Green Top */
+.expense-panel {
+    border-top-color: #ef4444;
+}
+
+/* Red Top */
+
+/* Panel Header */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    background-color: #fff;
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.panel-header .total {
+    font-family: 'Courier New', Courier, monospace;
+    /* Monospace for financial feel */
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.income-panel .total {
+    color: #059669;
+}
+
+.expense-panel .total {
+    color: #dc2626;
+}
+
+/* --- 5. LIST ROWS (Transactions) --- */
+.transaction-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s;
+    border-left: 5px solid transparent;
+
+    /* NEW: Remove link styling */
+    text-decoration: none;
+    color: inherit;
+    /* Keep text color normal, don't turn blue */
+    cursor: pointer;
+}
+
+.list-row:last-child {
+    border-bottom: none;
+    /* No line on the last item */
+}
+
+/* Ensure hover feels interactive */
+.list-row:hover {
+    background-color: #f9fafb;
+    transform: translateX(4px);
+    /* Subtle slide effect */
+}
+
+/* Text Styles */
+.row-left .title {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+}
+
+.comment-preview {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.row-right .amount {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+/* --- 6. STATUS LOGIC (Traffic Lights) --- */
+
+/* EXPENSES: Always Solid Red */
+.expense-row {
+    border-left-color: #ef4444;
+}
+
+.expense-row .amount {
+    color: #dc2626;
+}
+
+
+/* INCOMES: Dynamic Logic */
+
+/* 1. Certain (Solid Green) */
+.list-row.certain {
+    border-left-color: #10b981;
+}
+
+.list-row.certain .amount {
+    color: #059669;
+}
+
+/* 2. Probable (Solid Amber) */
+.list-row.probable {
+    border-left-color: #f59e0b;
+}
+
+.list-row.probable .amount {
+    color: #d97706;
+}
+
+/* 3. Uncertain (Dashed Red + Tint) */
+.list-row.uncertain {
+    border-left: 5px dashed #f87171;
+    /* Visual cue: "Not Solid" */
+    background-color: #fef2f2;
+    /* Faint red background */
+}
+
+.list-row.uncertain .amount {
+    color: #ef4444;
+}
+
+
+/* Debt Badge */
+.debt-badge {
+    display: inline-block;
+    background-color: #eff6ff;
+    color: #3b82f6;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    border: 1px solid #dbeafe;
+    margin-left: 8px;
+    vertical-align: middle;
+    cursor: help;
+}
+
+/* Empty State Message */
+.empty-state {
+    padding: 40px;
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* --- NEW EXPANDABLE FAB CSS --- */
+/* --- FAB (FLOATING ACTION BUTTON) FIXED --- */
+.fab-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    /* Ensure it floats above everything */
+    width: 64px;
+    /* Fixed width to align items */
+    height: 64px;
+}
+
+/* The Main Big Button */
+.fab-main {
+    background-color: #111827;
+    color: white;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.3s;
+    position: relative;
+    /* Anchor */
+    z-index: 2;
+}
+
+/* The Options (Hidden by default) */
+.fab-options {
+    position: absolute;
+    bottom: 70px;
+    /* Starts 70px ABOVE the bottom of the container */
+    left: 0;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    /* Stack items vertically */
+    align-items: center;
+    gap: 15px;
+    /* Space between the mini buttons */
+
+    /* Animation State: Hidden */
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    /* Bouncy pop-up */
+}
+
+/* ACTIVE STATE (Triggered by JS) */
+.fab-container.active .fab-options {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+.fab-container.active .fab-main {
+    transform: rotate(45deg);
+    /* Spin to X */
+    background-color: #374151;
+    /* Lighter gray when open */
+}
+
+/* Mini Buttons Styling */
+.fab-option {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.8rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+.fab-option:hover {
+    transform: scale(1.1);
+}
+
+.option-income {
+    background-color: #10b981;
+}
+
+.option-expense {
+    background-color: #ef4444;
+}
+
+
+/* --- MOBILE SPECIFIC FIXES --- */
+@media (max-width: 768px) {
+
+    /* 1. Move Button slightly inward so it's easy to tap */
+    .fab-container {
+        bottom: 25px;
+        right: 25px;
+    }
+
+    /* 2. CRITICAL: Add huge padding to body so you can scroll 
+       the last card ABOVE the button */
+    body {
+        padding-bottom: 120px !important;
+    }
+}
