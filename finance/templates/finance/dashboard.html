@@ -1,0 +1,48 @@
+{% extends 'base.html'%}
+
+{% block title %} DashBoard {% endblock %}
+
+{% block css_styling %}
+
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<h1 style='color:green'> Incomes<h1>
+    {% for income in incomes %}
+    
+    <h4>{{income.source}} | amout : {{income.amount_tl}}</h4>
+    
+    {% endfor %}
+    <h2>{{total_incomes}}</h2>
+
+
+
+<h1 style='color:red'> Expenses<h1>
+{% for expense in expenses %}
+
+    <h4>{{expense.purpose}} | amout : {{expense.amount_tl}}</h4>
+    
+    {% endfor %}
+    <h2>{{total_expenses}}</h2>
+
+
+
+<h1 style='color:yellow'> Specials<h1>
+{% for special in specials %}
+
+    <h4>{{special.purpose}} | amout : {{special.amount_tl}}</h4>
+        
+    {% endfor %}
+    <h2>{{total_specials}}</h2>
+
+<h1 style='color:purple'> Budget<h1>
+<h4>{{budget}}</h4>
+
+
+<h1> You can spend {{daily_allowance}} for the rest of the month</h1>
+{% endblock  %}
