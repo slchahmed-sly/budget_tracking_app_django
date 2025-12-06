@@ -25,8 +25,8 @@ class DashBoardView(View):
             rest_of_days = 1
 
         
-        incomes = models.Income.objects.filter(cycle=current_cycle)
-        expenses = models.Expense.objects.filter(cycle=current_cycle)
+        incomes = models.Income.objects.filter(cycle=current_cycle).order_by('-amount_mru')
+        expenses = models.Expense.objects.filter(cycle=current_cycle).order_by('-amount_mru')
 
 
         total_incomes = sum(i.amount_tl for i in incomes if i.amount_tl)
@@ -134,3 +134,75 @@ class DeleteExpenseView(View):
         expense = get_object_or_404(models.Expense, pk=pk)
         expense.delete()
         return redirect('home')
+
+
+
+
+
+# settings section related views
+
+class SettingsView(View):
+    def get(self, request):
+        cycle_form = forms.CycleForm()
+        recurring_expenses = models.RecurringExpense.objects.order_by('-amount_tl')
+        return render(request,'finance/settings.html',{'recurring_expenses':recurring_expenses,'form':cycle_form})
+
+
+class AddRecurringView(View):
+    def get(self,request):
+        form = forms.RecurringExpenseForm()
+        return render(request,'finance/add_recurring.html',{'form':form})
+
+    def post(self,request):
+        form = forms.RecurringExpenseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('settings')
+        return render(request,'finance/add_recurring.html',{'form':form})
+
+
+class EditRecurringView(View):
+    def get(self,request,pk):
+        recurring_expense = models.RecurringExpense.objects.get(pk = pk)
+        form = forms.RecurringExpenseForm(instance=recurring_expense)
+        return render(request,'finance/edit_recurring.html',{'form':form})
+
+    def post(self,request,pk):
+        recurring_expense = models.RecurringExpense.objects.get(pk = pk)
+        form = forms.RecurringExpenseForm(request.POST,instance=recurring_expense)
+        if form.is_valid():
+            form.save()
+            return redirect('settings')
+        return render(request,'finance/edit_recurring.html',{'form':form})
+
+
+
+class DeleteRecurringView(View):
+    def get(self,request,pk):
+        recurring_expense = models.RecurringExpense.objects.get(pk = pk)
+        return render(request,'finance/delete_confirm.html',{'obj':recurring_expense,'type':'Recurring Expense'})
+
+    def post(self,request,pk):
+        recurring_expense = models.RecurringExpense.objects.get(pk = pk)
+        recurring_expense.delete()
+        return redirect('settings')
+
+
+
+class StartCycleView(View):
+    
+    def post(self,request):
+        form = forms.CycleForm(request.POST)
+
+        if form.is_valid():
+            active_cycle = form.save()
+            recurring_expenses = models.RecurringExpense.objects.filter(is_active=True)
+            for recurring in recurring_expenses:
+                expense = models.Expense(purpose=recurring.purpose,amount_tl=recurring.amount_tl,cycle=active_cycle)
+                expense.save()
+            return redirect('home')
+        return redirect('settings')
+            
+        
+
+        

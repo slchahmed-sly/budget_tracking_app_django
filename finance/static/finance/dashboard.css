@@ -366,3 +366,73 @@ body {
         padding-bottom: 120px !important;
     }
 }
+
+
+/* --- SETTINGS FLOATING BUTTON --- */
+.fab-settings {
+    position: fixed;
+    bottom: 30px;
+    /* Same height as the Add button */
+    right: 110px;
+    /* Calculation: 30px (right margin) + 64px (Add button width) + 16px (gap) */
+    z-index: 1000;
+
+    /* Style it to look like a sibling to the main button */
+    background-color: #374151;
+    /* Slightly lighter gray to show it's secondary */
+    color: white;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 32px;
+    text-decoration: none;
+    /* No underline */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.fab-settings:hover {
+    background-color: #111827;
+    /* Darken on hover */
+    transform: rotate(90deg) scale(1.1);
+    /* Spin effect */
+}
+
+/* --- MOBILE ADJUSTMENTS --- */
+@media (max-width: 768px) {
+
+    /* Adjust position to match the mobile Add button */
+    .fab-settings {
+        bottom: 25px;
+        right: 100px;
+        /* Tighter gap on mobile */
+        width: 50px;
+        /* Slightly smaller on mobile to save space */
+        height: 50px;
+        font-size: 24px;
+    }
+
+    /* Note: You might need to adjust the Main FAB size in your existing
+       mobile media query to 50px as well if you want them identical size */
+}
+
+/* Size the SVG Icon inside the button */
+.fab-settings svg {
+    width: 32px;
+    height: 32px;
+    stroke: white;
+    /* This makes the lines white */
+}
+
+/* Mobile Adjustment for the icon size */
+@media (max-width: 768px) {
+    .fab-settings svg {
+        width: 24px;
+        height: 24px;
+    }
+}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Settings & Cycle{% endblock %}
+
+{% block css_styling %}
+    <link rel="stylesheet" href="{% static 'finance/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-header">
+    <a href="{% url 'home' %}" class="btn-back-home">
+        ← Back to Dashboard
+    </a>
+</div>
+
+<div class="panel-card engine-panel">
+    <div class="panel-header engine-header">
+        <div class="header-text">
+            <h3>Cycle Manager</h3>
+            <p>Start a new month. This will generate expenses from your active templates.</p>
+        </div>
+        <div class="header-icon">⚙️</div>
+    </div>
+
+    <div class="panel-body">
+        <form action="{% url 'start_cycle' %}" method="POST" class="cycle-form">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Title</label>
+                    {{ form.title }} 
+                </div>
+                <div class="input-group">
+                    <label>Start Date</label>
+                    {{ form.start }} 
+                </div>
+
+                <div class="input-group">
+                    <label>Exchange Rate (MRU to TL)</label>
+                    {{ form.mru_to_tl }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-start-cycle">
+                🚀 Start New Cycle
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="panel-card recurring-panel">
+    <div class="panel-header recurring-header">
+        <h3>Recurring Templates</h3>
+        <a href="{% url 'add_recurring' %}" class="btn-add-new">+ New Template</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="recurring-table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Purpose</th>
+                    <th>Amount (TL)</th>
+                    <th>Amount (MRU)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in recurring_expenses %}
+                <tr>
+                    <td>
+                        {% if item.is_active %}
+                            <span class="status-badge active">Active</span>
+                        {% else %}
+                            <span class="status-badge inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    
+                    <td class="fw-bold">{{ item.purpose }}</td>
+                    
+                    <td>{{ item.amount_tl }} TL</td>
+                    <td class="text-muted">{{ item.amount_mru|default:"-" }}</td>
+                    
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'edit_recurring' item.pk %}" class="btn-icon edit" title="Edit">✎</a>
+                            <a href="{% url 'delete_recurring' item.pk %}" class="btn-icon delete" title="Delete">×</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-table">
+                        No templates yet. Add your Rent or Internet bill!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

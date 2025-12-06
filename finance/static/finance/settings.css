@@ -1,0 +1,263 @@
+/* --- Global --- */
+body {
+    background-color: #f3f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1f2937;
+    margin: 0;
+    padding: 20px;
+    padding-bottom: 100px;
+}
+
+/* --- Common Panel Styles --- */
+.panel-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 40px auto;
+    /* Spacing between panels */
+    max-width: 900px;
+    overflow: hidden;
+    border-top: 6px solid #ccc;
+}
+
+.panel-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #111827;
+}
+
+/* --- SECTION 1: ENGINE PANEL (Blue Theme) --- */
+.engine-panel {
+    border-top-color: #2563eb;
+}
+
+/* Royal Blue */
+
+.engine-header p {
+    margin: 5px 0 0 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.panel-body {
+    padding: 24px;
+}
+
+/* Cycle Form Layout */
+.cycle-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.btn-start-cycle {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+.btn-start-cycle:hover {
+    background-color: #1d4ed8;
+}
+
+
+/* --- SECTION 2: RECURRING PANEL (Purple Theme) --- */
+.recurring-panel {
+    border-top-color: #8b5cf6;
+}
+
+/* Violet */
+
+.btn-add-new {
+    background-color: #8b5cf6;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.btn-add-new:hover {
+    background-color: #7c3aed;
+}
+
+/* Data Table Styling */
+.table-responsive {
+    overflow-x: auto;
+    /* Allows scrolling on mobile */
+}
+
+.recurring-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.recurring-table th {
+    background-color: #f9fafb;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.recurring-table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.recurring-table tr:last-child td {
+    border-bottom: none;
+}
+
+.recurring-table tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Table Elements */
+.fw-bold {
+    font-weight: 600;
+    color: #111827;
+}
+
+.text-muted {
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.active {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+/* Green Pill */
+.inactive {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+/* Gray Pill */
+
+/* Action Icons */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+
+.edit {
+    color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+.edit:hover {
+    background-color: #dbeafe;
+}
+
+.delete {
+    color: #ef4444;
+    background-color: #fef2f2;
+}
+
+.delete:hover {
+    background-color: #fee2e2;
+}
+
+.empty-table {
+    text-align: center;
+    color: #9ca3af;
+    padding: 40px;
+    font-style: italic;
+}
+
+/* --- Navigation --- */
+.nav-header {
+    max-width: 900px;
+    margin: 0 auto 20px auto;
+}
+
+.btn-back-home {
+    text-decoration: none;
+    color: #6b7280;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s;
+}
+
+.btn-back-home:hover {
+    color: #111827;
+    /* Darker on hover */
+    transform: translateX(-5px);
+    /* Slide left effect */
+}

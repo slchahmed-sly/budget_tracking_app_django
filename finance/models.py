@@ -18,13 +18,13 @@ class Cycle(models.Model):
         return f'{self.title}'
 
 class RecurringExpense(models.Model):
-    amount_mru = models.PositiveIntegerField()
-    amount_tl = models.PositiveIntegerField()
-    title = models.CharField(max_length = 100)
-    is_active = models.BooleanField(default=False)
+    amount_mru = models.PositiveIntegerField(blank=True, null=True)
+    amount_tl = models.PositiveIntegerField(blank=True, null=True)
+    purpose = models.CharField(max_length = 100)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f'{self.title}: {self.amount_tl}'
+        return f'{self.purpose}: {self.amount_tl}'
 
 class BaseTransaction(models.Model):
     """
@@ -35,9 +35,6 @@ class BaseTransaction(models.Model):
     amount_tl = models.PositiveIntegerField(blank=True, null=True)
     comment = models.TextField(blank=True)
     
-    # We define the Foreign Key here because every transaction needs a cycle.
-    # TIP: We use '%(class)s' in related_name to automatically generate 
-    # unique names like 'incomes', 'expenses', 'specials'.
     cycle = models.ForeignKey(
         Cycle, 
         on_delete=models.CASCADE, 
@@ -45,7 +42,7 @@ class BaseTransaction(models.Model):
     )
 
     class Meta:
-        abstract = True  # This is the magic line
+        abstract = True  
 
     def clean(self):
         if not self.amount_mru and not self.amount_tl:
