@@ -145,3 +145,7 @@ LOGIN_REDIRECT_URL = 'home'
 
 # Where to go if you try to visit a protected page while logged out
 LOGIN_URL = 'login'
+
+
+# specific for Railway deployment
+CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
