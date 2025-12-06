@@ -148,4 +148,8 @@ LOGIN_URL = 'login'
 
 
 # specific for Railway deployment
-CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
+CSRF_TRUSTED_ORIGINS = [
+    "https://va8ti.com",
+    "https://www.va8ti.com",
+    "https://web-production-25ae8.up.railway.app",
+]
