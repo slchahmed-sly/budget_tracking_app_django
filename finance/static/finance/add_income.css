@@ -42,8 +42,7 @@ body {
     font-size: 0.9rem;
 }
 
-input[type="text"],
-input[type="number"],
+input:not([type="radio"]):not([type="checkbox"]):not([type="submit"]):not([type="hidden"]),
 textarea {
     width: 100%;
     padding: 12px 16px;
@@ -226,6 +225,22 @@ input[value="uncertain"]:checked+.status-card .dot {
     font-size: 0.9rem;
 }
 
-.btn-cancel:hover {
-    color: #1f2937;
+
+/* --- Auth Blue Theme --- */
+.form-panel.auth-blue {
+    border-top-color: #3b82f6;
+}
+
+.btn-save.btn-auth {
+    background-color: #3b82f6;
+}
+
+.btn-save.btn-auth:hover {
+    background-color: #2563eb;
+}
+
+.auth-blue input:focus,
+.auth-blue .form-group input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }

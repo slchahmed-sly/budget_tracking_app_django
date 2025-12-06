@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-
+from django.contrib.auth.models import User
 
 STATUS_CHOICES = [
     ('certain', 'Certain (Green)'),
@@ -10,29 +10,29 @@ STATUS_CHOICES = [
 
 
 class Cycle(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cycles')
     start  = models.DateField()
     title = models.CharField(max_length=100)
-    mru_to_tl = models.DecimalField(max_digits=6,decimal_places=2)
+    currency_symbol = models.CharField(max_length=10, default="TL")
 
     def __str__(self):
-        return f'{self.title}'
+        return f"{self.title} ({self.user.username})"
 
 class RecurringExpense(models.Model):
-    amount_mru = models.PositiveIntegerField(blank=True, null=True)
-    amount_tl = models.PositiveIntegerField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recurring_expenses')
+    amount = models.PositiveIntegerField(blank=True, null=True)
     purpose = models.CharField(max_length = 100)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f'{self.purpose}: {self.amount_tl}'
+        return f'{self.purpose}: {self.amount} ({self.user.username})'
 
 class BaseTransaction(models.Model):
     """
     This model will not create a database table. 
     It is just a template for other models.
     """
-    amount_mru = models.PositiveIntegerField(blank=True, null=True)
-    amount_tl = models.PositiveIntegerField(blank=True, null=True)
+    amount = models.PositiveIntegerField(blank=True, null=True)
     comment = models.TextField(blank=True)
     
     cycle = models.ForeignKey(
@@ -44,36 +44,6 @@ class BaseTransaction(models.Model):
     class Meta:
         abstract = True  
 
-    def clean(self):
-        if not self.amount_mru and not self.amount_tl:
-            raise ValidationError("You must provide either MRU or TL amount.")
-
-    def save(self, *args, **kwargs):
-       
-        if self.pk:
-          
-            old_record = self.__class__.objects.get(pk=self.pk)
-            
-            if self.amount_tl != old_record.amount_tl:
-                
-                self.amount_mru = int(round(self.amount_tl * self.cycle.mru_to_tl))
-            
-            elif self.amount_mru != old_record.amount_mru:
-                
-                self.amount_tl = int(round(self.amount_mru / self.cycle.mru_to_tl))
-            
-        else:
-            
-            if self.amount_mru and not self.amount_tl:
-                self.amount_tl = int(round(self.amount_mru / self.cycle.mru_to_tl))
-            elif self.amount_tl:
-                self.amount_mru = int(round(self.amount_tl * self.cycle.mru_to_tl))
-        
-        super().save(*args, **kwargs)
-
-
-
-
 
 
 class Expense(BaseTransaction):
@@ -81,7 +51,7 @@ class Expense(BaseTransaction):
     i_owe = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.purpose}: {self.amount_tl}'
+        return f'{self.purpose}: {self.amount}'
 
 
 class Income(BaseTransaction):
@@ -90,14 +60,18 @@ class Income(BaseTransaction):
     owe_me = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.source}: {self.amount_tl}'
+        return f'{self.source}: {self.amount}'
 
 
 class Special(BaseTransaction):
-    purpose = models.CharField(max_length=100)
+    TYPE_CHOICES = [
+        ('income', 'Income'),
+        ('expense', 'Expense')
+    ]
+    title = models.CharField(max_length=100)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='expense')
     i_owe = models.BooleanField(default=False)
     owe_me = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.purpose}: {self.amount_tl}'
-
+        return f'{self.title}: {self.amount}'

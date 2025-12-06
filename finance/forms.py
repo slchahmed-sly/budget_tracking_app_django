@@ -4,13 +4,20 @@ from . import models
 class CycleForm(forms.ModelForm):
     class Meta:
         model = models.Cycle
-        fields = '__all__'
+        exclude = ['user']
+        widgets = {
+            'currency_symbol': forms.TextInput(attrs={'placeholder': 'e.g. TL, USD'}),
+            'start': forms.DateInput(attrs={'type': 'date'}),
+        }
+        labels = {
+            'currency_symbol': 'Currency Name'
+        }
 
 
 class RecurringExpenseForm(forms.ModelForm):
     class Meta:
         model = models.RecurringExpense
-        fields = '__all__'
+        exclude = ['user']
 
 
 class ExpenseForm(forms.ModelForm):
@@ -38,4 +45,8 @@ class IncomeForm(forms.ModelForm):
 class SpecialForm(forms.ModelForm):
     class Meta:
         model = models.Special
-        fields = '__all__'
+        exclude = ['cycle']
+        widgets = {
+            'type': forms.RadioSelect,
+            'comment': forms.Textarea(attrs={'rows': 3}),
+        }

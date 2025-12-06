@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Start a Cycle | My Ledger{% endblock %}
+
+{% block css_styling %}
+    <style>
+        .no-cycle-container {
+            max-width: 600px;
+            margin: 60px auto;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-top: 6px solid #3b82f6; /* Blue Theme */
+        }
+        .hero-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        h2 {
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        .btn-cta {
+            background-color: #3b82f6;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .btn-cta:hover {
+            background-color: #2563eb;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="no-cycle-container">
+    <span class="hero-icon">🗓️</span>
+    <h2>No Active Cycle Found</h2>
+    <p>
+        To start tracking your finances, you first need to start a <strong>Cycle</strong>. 
+        <br><br>
+        A Cycle typically represents a month (or any pay period) where you track your income and expenses. 
+        Balance and Daily Allowance are calculated based on the days remaining in your cycle.
+    </p>
+    <a href="{% url 'settings' %}" class="btn-cta">Go to Settings to Start Cycle</a>
+</div>
+{% endblock %}

@@ -141,30 +141,104 @@ body {
 
 .list-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 24px;
+    flex-wrap: wrap;
+    /* Allow expansion to wrap to next line */
+    padding: 0;
+    /* Remove padding from container, move to children */
     border-bottom: 1px solid #f3f4f6;
     transition: background-color 0.2s;
     border-left: 5px solid transparent;
-
-    /* NEW: Remove link styling */
-    text-decoration: none;
-    color: inherit;
-    /* Keep text color normal, don't turn blue */
     cursor: pointer;
 }
 
 .list-row:last-child {
     border-bottom: none;
-    /* No line on the last item */
 }
 
-/* Ensure hover feels interactive */
 .list-row:hover {
     background-color: #f9fafb;
-    transform: translateX(4px);
-    /* Subtle slide effect */
+}
+
+/* New wrapper for the main visible part */
+.row-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 16px 24px;
+    /* Padding moved here */
+}
+
+/* Expandable Section */
+.row-expandable {
+    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease;
+    background-color: #f9fafb;
+    padding: 0 24px;
+    /* Horizontal padding only initially */
+}
+
+.list-row.expanded .row-expandable {
+    max-height: 300px;
+    /* Arbitrary large height */
+    padding-bottom: 20px;
+    /* Add bottom padding when expanded */
+    border-top: 1px solid #e5e7eb;
+}
+
+.full-comment {
+    font-size: 0.9rem;
+    color: #4b5563;
+    margin: 15px 0;
+    line-height: 1.5;
+}
+
+/* Action Buttons */
+.row-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.action-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-edit {
+    background-color: #e0f2fe;
+    color: #0284c7;
+}
+
+.btn-edit:hover {
+    background-color: #bae6fd;
+}
+
+.btn-delete {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background-color: #fecaca;
 }
 
 /* Text Styles */
@@ -351,6 +425,73 @@ body {
 }
 
 
+/* --- NEW SPECIALS SECTION --- */
+.specials-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.special-panel {
+    border-top-color: #f59e0b;
+    /* Amber/Yellow base */
+}
+
+/* Header with Tags */
+.header-right {
+    display: flex;
+    gap: 10px;
+}
+
+.total-tag {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.income-tag {
+    background-color: #d1fae5;
+    color: #059669;
+}
+
+.expense-tag {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* Special Rows */
+/* Default Special Row Styling */
+.special-row {
+    border-left: 5px solid #d1d5db;
+    /* Gray default if unknown */
+}
+
+.special-row.income {
+    border-left-color: #fbbf24;
+    /* Amber for special income */
+}
+
+.special-row.expense {
+    border-left-color: #fca5a5;
+    /* Light Red for special expense */
+}
+
+/* Text Colors */
+.text-success {
+    color: #059669;
+}
+
+.text-danger {
+    color: #dc2626;
+}
+
+/* --- FAB Special Option --- */
+.option-special {
+    background-color: #f59e0b;
+    /* Amber */
+}
+
 /* --- MOBILE SPECIFIC FIXES --- */
 @media (max-width: 768px) {
 
@@ -429,10 +570,63 @@ body {
     /* This makes the lines white */
 }
 
-/* Mobile Adjustment for the icon size */
+/* --- SECONDARY LEFT FAB VARIATION (Settings) --- */
+.fab-container.secondary-fab-left {
+    bottom: 30px;
+    right: 110px;
+    /* 30px (right) + 64px (width) + 16px (gap) */
+    z-index: 1000;
+}
+
+/* On Mobile, tighten the gap */
 @media (max-width: 768px) {
-    .fab-settings svg {
-        width: 24px;
-        height: 24px;
+    .fab-container.secondary-fab-left {
+        bottom: 25px;
+        right: 100px;
     }
+}
+
+/* Ensure the button matches theme */
+.fab-container.secondary-fab-left .fab-main {
+    background-color: #374151;
+    /* Lighter Gray */
+    border: 2px solid #4b5563;
+    /* Border for contrast */
+}
+
+/* Menu opens UPWARDS (Standard) */
+.fab-container.secondary-fab-left .fab-options {
+    bottom: 70px;
+    /* Above the button */
+    top: auto;
+
+    transform: translateY(20px);
+    /* Animate from bottom */
+}
+
+.fab-container.secondary-fab-left.active .fab-options {
+    transform: translateY(0);
+}
+
+/* Specific styling for the menu items */
+.option-settings {
+    background-color: #374151;
+    /* Gray */
+}
+
+.option-logout {
+    background-color: #ef4444;
+    /* Red */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+.option-logout:hover {
+    transform: scale(1.1);
 }

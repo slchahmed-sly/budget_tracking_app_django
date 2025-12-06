@@ -1,0 +1,152 @@
+/* --- Dedicated Auth Page Styling --- */
+
+/* 1. Global Reset for Auth Pages */
+body {
+    background-color: #f3f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1f2937;
+    margin: 0;
+    padding: 20px;
+}
+
+/* 2. Main Card */
+.form-panel {
+    background: white;
+    max-width: 450px;
+    /* Optimal width for login forms */
+    margin: 60px auto;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    border-top: 8px solid #3b82f6;
+    /* Auth Signature Blue */
+}
+
+/* 3. Typography */
+.panel-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.panel-header h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.panel-header p {
+    margin: 10px 0 0 0;
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+/* 4. Form Elements */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.field-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+/* 5. ROBUST INPUT SELECTOR */
+/* This ensures ALL text-like inputs get styled, fixing the previous bug */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="hidden"]),
+textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #f9fafb;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    font-family: inherit;
+    color: #1f2937;
+}
+
+/* Focus State */
+input:focus,
+textarea:focus {
+    border-color: #3b82f6;
+    /* Blue focus */
+    background-color: white;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Help Text */
+small {
+    display: block;
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+/* 6. Actions & Buttons */
+.form-actions {
+    margin-top: 35px;
+}
+
+.btn-auth {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background-color: #3b82f6;
+    /* Blue */
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-auth:hover {
+    background-color: #2563eb;
+    /* Darker Blue */
+    transform: translateY(-1px);
+}
+
+.btn-auth:active {
+    transform: translateY(0);
+}
+
+.btn-cancel {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.btn-cancel:hover {
+    color: #111827;
+    text-decoration: underline;
+}
+
+/* 7. Error Messages */
+.errorlist {
+    color: #dc2626;
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.error-box {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border: 1px solid #fecaca;
+}

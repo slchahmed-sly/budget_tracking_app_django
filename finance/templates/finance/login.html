@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block css_styling %}
+    <link rel="stylesheet" href="{% static 'finance/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-panel auth-blue">
+    <div class="panel-header">
+        <h2>Welcome Back</h2>
+        <p>Login to manage your cycle</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="error-box" style="background:#fee2e2; color:#b91c1c; padding:15px; border-radius:8px; margin-bottom:20px;">
+                {% for error in form.non_field_errors %}
+                    <p style="font-weight:bold; margin:0;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label class="field-label">Username</label>
+            {{ form.username }}
+        </div>
+
+        <div class="form-group">
+            <label class="field-label">Password</label>
+            {{ form.password }}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save btn-auth">Login</button>
+            <a href="{% url 'signup' %}" class="btn-cancel">Need an account? Sign Up</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
