@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Start a Cycle | My Ledger{% endblock %}
+{% block title %}{% trans "Start a Cycle" %} | My Ledger{% endblock %}
 
 {% block css_styling %}
     <style>
@@ -49,13 +50,12 @@
 {% block content %}
 <div class="no-cycle-container">
     <span class="hero-icon">🗓️</span>
-    <h2>No Active Cycle Found</h2>
+    <h2>{% trans "No Active Cycle Found" %}</h2>
     <p>
-        To start tracking your finances, you first need to start a <strong>Cycle</strong>. 
+        {% trans "To start tracking your finances, you first need to start a" %} <strong>{% trans "Cycle" %}</strong>. 
         <br><br>
-        A Cycle typically represents a month (or any pay period) where you track your income and expenses. 
-        Balance and Daily Allowance are calculated based on the days remaining in your cycle.
+        {% trans "A Cycle typically represents a month (or any pay period) where you track your income and expenses. Balance and Daily Allowance are calculated based on the days remaining in your cycle." %}
     </p>
-    <a href="{% url 'settings' %}" class="btn-cta">Go to Settings to Start Cycle</a>
+    <a href="{% url 'settings' %}" class="btn-cta">{% trans "Go to Settings to Start Cycle" %}</a>
 </div>
 {% endblock %}

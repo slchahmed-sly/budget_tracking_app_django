@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Settings & Cycle{% endblock %}
+{% block title %}{% trans "Settings & Cycle" %}{% endblock %}
 
 {% block css_styling %}
     <link rel="stylesheet" href="{% static 'finance/settings.css' %}">
@@ -11,15 +12,15 @@
 
 <div class="nav-header">
     <a href="{% url 'home' %}" class="btn-back-home">
-        ← Back to Dashboard
+        ← {% trans "Back to Dashboard" %}
     </a>
 </div>
 
 <div class="panel-card engine-panel">
     <div class="panel-header engine-header">
         <div class="header-text">
-            <h3>Cycle Manager</h3>
-            <p>Start a new month. This will generate expenses from your active templates.</p>
+            <h3>{% trans "Cycle Manager" %}</h3>
+            <p>{% trans "Start a new month. This will generate expenses from your active templates." %}</p>
         </div>
     </div>
 
@@ -29,22 +30,22 @@
             
             <div class="form-grid">
                 <div class="input-group">
-                    <label>Title</label>
+                    <label>{% trans "Title" %}</label>
                     {{ form.title }} 
                 </div>
                 <div class="input-group">
-                    <label>Start Date</label>
+                    <label>{% trans "Start Date" %}</label>
                     {{ form.start }} 
                 </div>
 
                 <div class="input-group">
-                    <label>Currency Symbol that will be used in the cycle</label>
+                    <label>{% trans "Currency Symbol that will be used in the cycle" %}</label>
                     {{ form.currency_symbol }}
                 </div>
             </div>
 
             <button type="submit" class="btn-start-cycle">
-                🚀 Start New Cycle
+                🚀 {% trans "Start New Cycle" %}
             </button>
         </form>
     </div>
@@ -52,18 +53,18 @@
 
 <div class="panel-card recurring-panel">
     <div class="panel-header recurring-header">
-        <h3>Recurring Templates</h3>
-        <a href="{% url 'add_recurring' %}" class="btn-add-new">+ New Template</a>
+        <h3>{% trans "Recurring Templates" %}</h3>
+        <a href="{% url 'add_recurring' %}" class="btn-add-new">+ {% trans "New Template" %}</a>
     </div>
 
     <div class="table-responsive">
         <table class="recurring-table">
             <thead>
                 <tr>
-                    <th>Status</th>
-                    <th>Purpose</th>
-                    <th>Amount ({{cycle_currency}})</th>
-                    <th>Actions</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Purpose" %}</th>
+                    <th>{% trans "Amount" %} ({{cycle_currency}})</th>
+                    <th>{% trans "Actions" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -71,9 +72,9 @@
                 <tr>
                     <td>
                         {% if item.is_active %}
-                            <span class="status-badge active">Active</span>
+                            <span class="status-badge active">{% trans "Active" %}</span>
                         {% else %}
-                            <span class="status-badge inactive">Inactive</span>
+                            <span class="status-badge inactive">{% trans "Inactive" %}</span>
                         {% endif %}
                     </td>
                     
@@ -91,7 +92,7 @@
                 {% empty %}
                 <tr>
                     <td colspan="5" class="empty-table">
-                        No templates yet. Add your Rent or Internet bill!
+                        {% trans "No templates yet. Add your Rent or Internet bill!" %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -99,5 +100,128 @@
         </table>
     </div>
 </div>
+
+<!-- Language Switcher FAB & Styles -->
+<style>
+    /* Inline FAB Styles to ensure they apply immediately */
+    .fab-container.language-fab {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 1000;
+        width: 64px;
+        height: 64px;
+    }
+    .language-fab .fab-main {
+        background-color: #111827; /* Dark Charcoal to match Dashboard FAB */
+        color: white;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: transform 0.3s;
+        position: relative;
+        z-index: 2;
+    }
+    .language-fab .fab-options {
+        position: absolute;
+        bottom: 70px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        opacity: 0;
+        transform: translateY(20px);
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    .language-fab.active .fab-options {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+    }
+    .language-fab.active .fab-main {
+        transform: rotate(45deg);
+        background-color: #374151;
+    }
+    .language-fab .fab-option {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 24px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+    .language-fab .fab-option:hover {
+        transform: scale(1.1);
+    }
+</style>
+
+<div class="fab-container language-fab">
+    <div class="fab-options">
+        <form action="{% url 'set_language' %}" method="post" style="padding:0; margin:0;">
+            {% csrf_token %}
+            <input name="next" type="hidden" value="{{ request.path }}">
+            <input name="language" type="hidden" value="en">
+            <button type="submit" class="fab-option" style="background-color: #f3f4f6;" title="English">
+                🇬🇧
+            </button>
+        </form>
+        <form action="{% url 'set_language' %}" method="post" style="padding:0; margin:0;">
+            {% csrf_token %}
+            <input name="next" type="hidden" value="{{ request.path }}">
+            <input name="language" type="hidden" value="fr">
+            <button type="submit" class="fab-option" style="background-color: #f3f4f6;" title="Français">
+                🇫🇷
+            </button>
+        </form>
+    </div>
+    <div class="fab-main">
+        <!-- Globe SVG Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 32px; height: 32px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m-15.686 0A11.953 11.953 0 0112 10.5c2.998 0 5.74-1.1 7.843-2.918m-15.686 0A8.959 8.959 0 013 12c0 .778.099 1.533.284 2.253m0 0A11.959 11.959 0 0112 10.5a11.959 11.959 0 019 4.253M12 21c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0c2.485 0 4.5 4.03 4.5 9s-2.015 9-4.5 9z" />
+        </svg>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fab_container = document.querySelector('.language-fab');
+        if (fab_container) {
+            const fab_main = fab_container.querySelector('.fab-main');
+
+            fab_main.addEventListener('click', function(e) {
+                e.stopPropagation();
+                fab_container.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function() {
+                fab_container.classList.remove('active');
+            });
+            
+            // Prevent closing when clicking inside options
+            const options = fab_container.querySelector('.fab-options');
+            if(options) {
+                options.addEventListener('click', function(e) {
+                     e.stopPropagation();
+                });
+            }
+        }
+    });
+</script>
 
 {% endblock %}

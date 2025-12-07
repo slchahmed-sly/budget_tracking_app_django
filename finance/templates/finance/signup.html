@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Sign Up{% endblock %}
+{% block title %}{% trans "Sign Up" %}{% endblock %}
 
 {% block css_styling %}
     <link rel="stylesheet" href="{% static 'finance/auth.css' %}">
@@ -10,8 +11,8 @@
 {% block content %}
 <div class="form-panel auth-blue">
     <div class="panel-header">
-        <h2>Create Account</h2>
-        <p>Join to start tracking your finances</p>
+        <h2>{% trans "Create Account" %}</h2>
+        <p>{% trans "Join to start tracking your finances" %}</p>
     </div>
 
     <form method="POST">
@@ -19,7 +20,7 @@
 
         {% if form.errors %}
             <div class="error-box" style="background:#fee2e2; color:#b91c1c; padding:15px; border-radius:8px; margin-bottom:20px;">
-                <p style="font-weight:bold;">Please fix the errors:</p>
+                <p style="font-weight:bold;">{% trans "Please fix the errors:" %}</p>
                 {{ form.errors }}
             </div>
         {% endif %}
@@ -35,8 +36,8 @@
         {% endfor %}
 
         <div class="form-actions">
-            <button type="submit" class="btn-save btn-auth">Sign Up</button>
-            <a href="{% url 'login' %}" class="btn-cancel">Already have an account? Login</a>
+            <button type="submit" class="btn-save btn-auth">{% trans "Sign Up" %}</button>
+            <a href="{% url 'login' %}" class="btn-cancel">{% trans "Already have an account? Login" %}</a>
         </div>
     </form>
 </div>

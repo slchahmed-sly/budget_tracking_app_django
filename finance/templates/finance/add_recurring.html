@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}New Recurring Template{% endblock %}
+{% block title %}{% trans "New Recurring Template" %}{% endblock %}
 
 {% block css_styling %}
     <link rel="stylesheet" href="{% static 'finance/recurring_form.css' %}">
@@ -10,8 +11,8 @@
 {% block content %}
 <div class="form-panel">
     <div class="panel-header">
-        <h2>New Recurring Template</h2>
-        <p>Define a fixed bill (e.g., Rent, Internet) to copy every month.</p>
+        <h2>{% trans "New Recurring Template" %}</h2>
+        <p>{% trans "Define a fixed bill (e.g., Rent, Internet) to copy every month." %}</p>
     </div>
 
     <form method="POST">
@@ -19,19 +20,19 @@
 
         {% if form.errors %}
             <div class="error-box">
-                <p>Please fix the errors below:</p>
+                <p>{% trans "Please fix the errors below:" %}</p>
                 {{ form.errors }}
             </div>
         {% endif %}
 
         <div class="form-group">
-            <label class="field-label">Purpose / Title</label>
+            <label class="field-label">{% trans "Purpose / Title" %}</label>
             {{ form.purpose }}
         </div>
 
         <div class="form-row">
             <div class="form-group main-amount">
-                <label class="field-label">Amount (TL)</label>
+                <label class="field-label">{% trans "Amount" %} (TL)</label>
                 {{ form.amount }}
             </div>
         </div>
@@ -39,13 +40,13 @@
         <div class="form-group checkbox-group">
              {{ form.is_active }}
              <label for="{{ form.is_active.id_for_label }}">
-                 Active (Include in next cycle?)
+                 {% trans "Active (Include in next cycle?)" %}
              </label>
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn-save">Save Template</button>
-            <a href="{% url 'settings' %}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">{% trans "Save Template" %}</button>
+            <a href="{% url 'settings' %}" class="btn-cancel">{% trans "Cancel" %}</a>
         </div>
     </form>
 </div>

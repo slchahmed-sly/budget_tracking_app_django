@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Confirm Deletion{% endblock %}
+{% block title %}{% trans "Confirm Deletion" %}{% endblock %}
 
 {% block css_styling %}
 <link rel="stylesheet" href="{% static 'dashboard.css' %}">
@@ -41,21 +42,21 @@
 {% block content %}
 <div class="confirm-card">
     <span class="warning-icon">⚠️</span>
-    <h2>Delete this {{ type }}?</h2>
+    <h2>{% trans "Delete this" %} {{ type }}?</h2>
     
     <p>
-        Are you sure you want to remove 
+        {% trans "Are you sure you want to remove" %} 
         <strong style="color:#111827">{{ obj.source }}{{ obj.purpose }}</strong>? 
         <br>
-        This cannot be undone.
+        {% trans "This cannot be undone." %}
     </p>
 
     <div class="actions">
-        <a href="javascript:history.back()" class="btn-safe">Cancel</a>
+        <a href="javascript:history.back()" class="btn-safe">{% trans "Cancel" %}</a>
 
         <form method="POST">
             {% csrf_token %}
-            <button type="submit" class="btn-danger">Yes, Delete it</button>
+            <button type="submit" class="btn-danger">{% trans "Yes, Delete it" %}</button>
         </form>
     </div>
 </div>

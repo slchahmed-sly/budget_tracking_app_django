@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Edit Expense{% endblock %}
+{% block title %}{% trans "Edit Expense" %}{% endblock %}
 
 {% block css_styling %}
     <link rel="stylesheet" href="{% static 'finance/edit_expense.css' %}">
@@ -10,8 +11,8 @@
 {% block content %}
 <div class="form-panel">
     <div class="panel-header">
-        <h2>Edit Expense</h2>
-        <p>Update details or correct mistakes</p>
+        <h2>{% trans "Edit Expense" %}</h2>
+        <p>{% trans "Update details or correct mistakes" %}</p>
     </div>
 
     <form method="POST">
@@ -19,42 +20,42 @@
 
         {% if form.errors %}
             <div style="background-color: #fef2f2; color: #b91c1c; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #f87171;">
-                <p style="font-weight: bold; margin: 0 0 5px 0;">Please fix the errors below:</p>
+                <p style="font-weight: bold; margin: 0 0 5px 0;">{% trans "Please fix the errors below:" %}</p>
                 {{ form.errors }}
             </div>
         {% endif %}
 
         <div class="form-group">
-            <label class="field-label">Purpose</label>
+            <label class="field-label">{% trans "Purpose" %}</label>
             {{ form.purpose }}
         </div>
 
         <div class="form-row">
             <div class="form-group main-amount">
-                <label class="field-label">Amount ({{ cycle_currency }})</label>
+                <label class="field-label">{% trans "Amount" %} ({{ cycle_currency }})</label>
                 {{ form.amount }}
             </div>
         </div>
 
         <div class="form-group">
-            <label class="field-label">Comment / Notes</label>
+            <label class="field-label">{% trans "Comment / Notes" %}</label>
             {{ form.comment }}
         </div>
 
         <div class="form-group checkbox-group">
              {{ form.i_owe }}
              <label for="{{ form.i_owe.id_for_label }}">
-                 I owe this money (Debt)
+                 {% trans "I owe this money (Debt)" %}
              </label>
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn-save">Update Expense</button>
-            <a href="{% url 'home' %}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">{% trans "Update Expense" %}</button>
+            <a href="{% url 'home' %}" class="btn-cancel">{% trans "Cancel" %}</a>
         </div>
 
         <div class="delete-section">
-            <a href="{% url 'delete_expense' expense.id %}" class="btn-delete">Delete this transaction</a>
+            <a href="{% url 'delete_expense' expense.id %}" class="btn-delete">{% trans "Delete this transaction" %}</a>
         </div>
 
     </form>

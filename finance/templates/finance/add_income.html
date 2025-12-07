@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Add Income{% endblock %}
+{% block title %}{% trans "Add Income" %}{% endblock %}
 
 {% block css_styling %}
     <link rel="stylesheet" href="{% static 'finance/add_income.css' %}">
@@ -10,27 +11,27 @@
 {% block content %}
 <div class="form-panel">
     <div class="panel-header">
-        <h2>New Income</h2>
-        <p>Money coming in</p>
+        <h2>{% trans "New Income" %}</h2>
+        <p>{% trans "Money coming in" %}</p>
     </div>
 
     <form method="POST">
         {% csrf_token %}
 
         <div class="form-group">
-            <label class="field-label">Source</label>
+            <label class="field-label">{% trans "Source" %}</label>
             {{ form.source }}
         </div>
 
         <div class="form-row">
             <div class="form-group main-amount">
-                <label class="field-label">Amount ({{ cycle_currency }})</label>
+                <label class="field-label">{% trans "Amount" %} ({{ cycle_currency }})</label>
                 {{ form.amount}}
             </div>
         </div>
 
         <div class="form-group">
-            <label class="field-label">Status</label>
+            <label class="field-label">{% trans "Status" %}</label>
             <div class="status-grid">
                 {% for radio in form.status %}
                 <div class="status-option">
@@ -45,20 +46,20 @@
         </div>
 
         <div class="form-group">
-            <label class="field-label">Comment / Notes</label>
+            <label class="field-label">{% trans "Comment / Notes" %}</label>
             {{ form.comment }}
         </div>
 
         <div class="form-group checkbox-group">
              {{ form.owe_me }}
              <label for="{{ form.owe_me.id_for_label }}">
-                 This is a debt (Someone owes me this)
+                 {% trans "This is a debt (Someone owes me this)" %}
              </label>
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn-save">Save Income</button>
-            <a href="{% url 'home' %}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">{% trans "Save Income" %}</button>
+            <a href="{% url 'home' %}" class="btn-cancel">{% trans "Cancel" %}</a>
         </div>
     </form>
 </div>

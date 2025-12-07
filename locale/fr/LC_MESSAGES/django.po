@@ -1,0 +1,460 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-07 18:28+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: finance/templates/finance/add_expense.html:5
+msgid "Add Expense"
+msgstr "Ajouter une Dépense"
+
+#: finance/templates/finance/add_expense.html:14
+msgid "New Expense"
+msgstr "Nouvelle Dépense"
+
+#: finance/templates/finance/add_expense.html:15
+msgid "Money leaving the account"
+msgstr "Argent sortant du compte"
+
+#: finance/templates/finance/add_expense.html:23
+#: finance/templates/finance/add_recurring.html:23
+#: finance/templates/finance/edit_expense.html:23
+#: finance/templates/finance/edit_income.html:23
+#: finance/templates/finance/edit_recurring.html:23
+msgid "Please fix the errors below:"
+msgstr ""
+
+#: finance/templates/finance/add_expense.html:29
+#: finance/templates/finance/edit_expense.html:29
+#: finance/templates/finance/settings.html:65
+msgid "Purpose"
+msgstr "Motif"
+
+#: finance/templates/finance/add_expense.html:35
+#: finance/templates/finance/add_income.html:28
+#: finance/templates/finance/add_recurring.html:35
+#: finance/templates/finance/add_special.html:29
+#: finance/templates/finance/edit_expense.html:35
+#: finance/templates/finance/edit_income.html:35
+#: finance/templates/finance/edit_recurring.html:35
+#: finance/templates/finance/edit_special.html:28
+#: finance/templates/finance/settings.html:66
+msgid "Amount"
+msgstr "Montant"
+
+#: finance/templates/finance/add_expense.html:41
+#: finance/templates/finance/add_income.html:49
+#: finance/templates/finance/edit_expense.html:41
+#: finance/templates/finance/edit_income.html:56
+msgid "Comment / Notes"
+msgstr "Commentaire / Notes"
+
+#: finance/templates/finance/add_expense.html:48
+#: finance/templates/finance/edit_expense.html:48
+msgid "I owe this money (Debt)"
+msgstr "Je dois cet argent (Dette)"
+
+#: finance/templates/finance/add_expense.html:53
+msgid "Save Expense"
+msgstr "Enregistrer la Dépense"
+
+#: finance/templates/finance/add_expense.html:54
+#: finance/templates/finance/add_income.html:62
+#: finance/templates/finance/add_recurring.html:49
+#: finance/templates/finance/add_special.html:46
+#: finance/templates/finance/delete_confirm.html:55
+#: finance/templates/finance/edit_expense.html:54
+#: finance/templates/finance/edit_income.html:69
+#: finance/templates/finance/edit_recurring.html:49
+#: finance/templates/finance/edit_special.html:45
+msgid "Cancel"
+msgstr "Annuler"
+
+#: finance/templates/finance/add_income.html:5
+msgid "Add Income"
+msgstr "Ajouter un Revenu"
+
+#: finance/templates/finance/add_income.html:14
+msgid "New Income"
+msgstr "Nouveau Revenu"
+
+#: finance/templates/finance/add_income.html:15
+msgid "Money coming in"
+msgstr "Argent entrant"
+
+#: finance/templates/finance/add_income.html:22
+#: finance/templates/finance/edit_income.html:29
+msgid "Source"
+msgstr "Source"
+
+#: finance/templates/finance/add_income.html:34
+#: finance/templates/finance/edit_income.html:41
+#: finance/templates/finance/settings.html:64
+msgid "Status"
+msgstr "Statut"
+
+#: finance/templates/finance/add_income.html:56
+#: finance/templates/finance/edit_income.html:63
+msgid "This is a debt (Someone owes me this)"
+msgstr "C'est une dette (Quelqu'un me doit ça)"
+
+#: finance/templates/finance/add_income.html:61
+msgid "Save Income"
+msgstr "Enregistrer le Revenu"
+
+#: finance/templates/finance/add_recurring.html:5
+#: finance/templates/finance/add_recurring.html:14
+msgid "New Recurring Template"
+msgstr "Nouveau Modèle Récurrent"
+
+#: finance/templates/finance/add_recurring.html:15
+msgid "Define a fixed bill (e.g., Rent, Internet) to copy every month."
+msgstr "Définir une facture fixe (ex: Loyer, Internet) à copier chaque mois."
+
+#: finance/templates/finance/add_recurring.html:29
+#: finance/templates/finance/edit_recurring.html:29
+msgid "Purpose / Title"
+msgstr "Motif / Titre"
+
+#: finance/templates/finance/add_recurring.html:43
+#: finance/templates/finance/edit_recurring.html:43
+msgid "Active (Include in next cycle?)"
+msgstr "Actif (Inclure dans le prochain cycle ?)"
+
+#: finance/templates/finance/add_recurring.html:48
+msgid "Save Template"
+msgstr "Enregistrer le Modèle"
+
+#: finance/templates/finance/add_special.html:5
+msgid "Add Special"
+msgstr "Ajouter Spécial"
+
+#: finance/templates/finance/add_special.html:14
+msgid "Uncertain Transaction"
+msgstr "Transaction Incertaine"
+
+#: finance/templates/finance/add_special.html:15
+msgid "Track potential income or expenses that are not yet confirmed."
+msgstr "Suivre les revenus ou dépenses potentiels non confirmés."
+
+#: finance/templates/finance/add_special.html:23
+#: finance/templates/finance/edit_special.html:22
+msgid "Type"
+msgstr "Type"
+
+#: finance/templates/finance/add_special.html:35
+#: finance/templates/finance/edit_special.html:34
+msgid "Title / Purpose"
+msgstr "Titre / Motif"
+
+#: finance/templates/finance/add_special.html:40
+#: finance/templates/finance/edit_special.html:39
+msgid "Comment (Optional)"
+msgstr "Commentaire (Optionnel)"
+
+#: finance/templates/finance/add_special.html:45
+msgid "Save Special"
+msgstr "Enregistrer Spécial"
+
+#: finance/templates/finance/dashboard.html:15
+msgid "Balance"
+msgstr "Solde"
+
+#: finance/templates/finance/dashboard.html:20
+msgid "Daily Allowance"
+msgstr "Allocation Journalière"
+
+#: finance/templates/finance/dashboard.html:25
+msgid "Days Left"
+msgstr "Jours Restants"
+
+#: finance/templates/finance/dashboard.html:34
+msgid "Income"
+msgstr "Revenu"
+
+#: finance/templates/finance/dashboard.html:62
+#: finance/templates/finance/dashboard.html:119
+#: finance/templates/finance/dashboard.html:188
+msgid "No comment provided."
+msgstr "Aucun commentaire fourni."
+
+#: finance/templates/finance/dashboard.html:70
+#: finance/templates/finance/dashboard.html:127
+#: finance/templates/finance/dashboard.html:207
+msgid "Edit"
+msgstr "Modifier"
+
+#: finance/templates/finance/dashboard.html:76
+#: finance/templates/finance/dashboard.html:133
+#: finance/templates/finance/dashboard.html:213
+msgid "Delete"
+msgstr "Supprimer"
+
+#: finance/templates/finance/dashboard.html:82
+msgid "No income recorded yet."
+msgstr "Aucun revenu enregistré."
+
+#: finance/templates/finance/dashboard.html:91
+msgid "Expenses"
+msgstr "Dépenses"
+
+#: finance/templates/finance/dashboard.html:139
+msgid "No expenses yet."
+msgstr "Aucune dépense."
+
+#: finance/templates/finance/dashboard.html:152
+msgid "Uncertain / Specials"
+msgstr "Incertain / Spéciaux"
+
+#: finance/templates/finance/dashboard.html:160
+msgid "Potential Balance"
+msgstr "Solde Potentiel"
+
+#: finance/templates/finance/dashboard.html:161
+msgid "Potential Daily"
+msgstr "Journalier Potentiel"
+
+#: finance/templates/finance/dashboard.html:199
+msgid "Confirm"
+msgstr "Confirmer"
+
+#: finance/templates/finance/dashboard.html:219
+msgid "No uncertain transactions."
+msgstr "Aucune transaction incertaine."
+
+#: finance/templates/finance/delete_confirm.html:5
+msgid "Confirm Deletion"
+msgstr "Confirmer la Suppression"
+
+#: finance/templates/finance/delete_confirm.html:45
+msgid "Delete this"
+msgstr "Supprimer ce(tte)"
+
+#: finance/templates/finance/delete_confirm.html:48
+msgid "Are you sure you want to remove"
+msgstr "Êtes-vous sûr de vouloir supprimer"
+
+#: finance/templates/finance/delete_confirm.html:51
+msgid "This cannot be undone."
+msgstr "Cette action est irréversible."
+
+#: finance/templates/finance/delete_confirm.html:59
+msgid "Yes, Delete it"
+msgstr "Oui, Supprimer"
+
+#: finance/templates/finance/edit_expense.html:5
+#: finance/templates/finance/edit_expense.html:14
+msgid "Edit Expense"
+msgstr "Modifier la Dépense"
+
+#: finance/templates/finance/edit_expense.html:15
+#: finance/templates/finance/edit_income.html:15
+msgid "Update details or correct mistakes"
+msgstr "Mettre à jour les détails ou corriger les erreurs"
+
+#: finance/templates/finance/edit_expense.html:53
+msgid "Update Expense"
+msgstr "Mettre à jour la Dépense"
+
+#: finance/templates/finance/edit_expense.html:58
+#: finance/templates/finance/edit_income.html:73
+msgid "Delete this transaction"
+msgstr "Supprimer cette transaction"
+
+#: finance/templates/finance/edit_income.html:5
+#: finance/templates/finance/edit_income.html:14
+msgid "Edit Income"
+msgstr "Modifier le Revenu"
+
+#: finance/templates/finance/edit_income.html:68
+msgid "Update Income"
+msgstr "Mettre à jour le Revenu"
+
+#: finance/templates/finance/edit_recurring.html:5
+#: finance/templates/finance/edit_recurring.html:14
+msgid "Edit Template"
+msgstr "Modifier le Modèle"
+
+#: finance/templates/finance/edit_recurring.html:15
+msgid "Update this blueprint for future cycles."
+msgstr "Mettre à jour ce plan pour les cycles futurs."
+
+#: finance/templates/finance/edit_recurring.html:48
+msgid "Update Template"
+msgstr "Mettre à jour le Modèle"
+
+#: finance/templates/finance/edit_recurring.html:53
+msgid "Delete this template"
+msgstr "Supprimer ce modèle"
+
+#: finance/templates/finance/edit_special.html:5
+msgid "Edit Special"
+msgstr "Modifier Spécial"
+
+#: finance/templates/finance/edit_special.html:14
+msgid "Edit Special Transaction"
+msgstr "Modifier la Transaction Spéciale"
+
+#: finance/templates/finance/edit_special.html:44
+msgid "Update Special"
+msgstr "Mettre à jour Spécial"
+
+#: finance/templates/finance/login.html:5
+#: finance/templates/finance/login.html:40
+msgid "Login"
+msgstr "Connexion"
+
+#: finance/templates/finance/login.html:14
+msgid "Welcome Back"
+msgstr "Bon retour"
+
+#: finance/templates/finance/login.html:15
+msgid "Login to manage your cycle"
+msgstr "Connectez-vous pour gérer votre cycle"
+
+#: finance/templates/finance/login.html:30
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#: finance/templates/finance/login.html:35
+msgid "Password"
+msgstr "Mot de passe"
+
+#: finance/templates/finance/login.html:41
+msgid "Need an account? Sign Up"
+msgstr "Besoin d'un compte ? S'inscrire"
+
+#: finance/templates/finance/no_cycle.html:5
+msgid "Start a Cycle"
+msgstr "Démarrer un Cycle"
+
+#: finance/templates/finance/no_cycle.html:53
+msgid "No Active Cycle Found"
+msgstr "Aucun Cycle Actif Trouvé"
+
+#: finance/templates/finance/no_cycle.html:55
+msgid "To start tracking your finances, you first need to start a"
+msgstr "Pour commencer à suivre vos finances, vous devez d'abord démarrer un"
+
+#: finance/templates/finance/no_cycle.html:55
+msgid "Cycle"
+msgstr "Cycle"
+
+#: finance/templates/finance/no_cycle.html:57
+msgid ""
+"A Cycle typically represents a month (or any pay period) where you track "
+"your income and expenses. Balance and Daily Allowance are calculated based "
+"on the days remaining in your cycle."
+msgstr ""
+"Un Cycle représente généralement un mois (ou toute période de paie) où vous suivez "
+"vos revenus et dépenses. Le Solde et l'Allocation Journalière sont calculés en fonction "
+"des jours restants dans votre cycle."
+
+#: finance/templates/finance/no_cycle.html:59
+msgid "Go to Settings to Start Cycle"
+msgstr "Aller aux Paramètres pour Démarrer un Cycle"
+
+#: finance/templates/finance/settings.html:5
+msgid "Settings & Cycle"
+msgstr "Paramètres & Cycle"
+
+#: finance/templates/finance/settings.html:15
+msgid "Back to Dashboard"
+msgstr "Retour au Tableau de Bord"
+
+#: finance/templates/finance/settings.html:22
+msgid "Cycle Manager"
+msgstr "Gestionnaire de Cycle"
+
+#: finance/templates/finance/settings.html:23
+msgid ""
+"Start a new month. This will generate expenses from your active templates."
+msgstr ""
+"Commencer un nouveau mois. Cela générera des dépenses à partir de vos "
+"modèles actifs."
+
+#: finance/templates/finance/settings.html:33
+msgid "Title"
+msgstr "Titre"
+
+#: finance/templates/finance/settings.html:37
+msgid "Start Date"
+msgstr "Date de Début"
+
+#: finance/templates/finance/settings.html:42
+msgid "Currency Symbol that will be used in the cycle"
+msgstr "Symbole Monétaire utilisé dans le cycle"
+
+#: finance/templates/finance/settings.html:48
+msgid "Start New Cycle"
+msgstr "Démarrer Nouveau Cycle"
+
+#: finance/templates/finance/settings.html:56
+msgid "Recurring Templates"
+msgstr "Modèles Récurrents"
+
+#: finance/templates/finance/settings.html:57
+msgid "New Template"
+msgstr "Nouveau Modèle"
+
+#: finance/templates/finance/settings.html:67
+msgid "Actions"
+msgstr "Actions"
+
+#: finance/templates/finance/settings.html:75
+msgid "Active"
+msgstr "Actif"
+
+#: finance/templates/finance/settings.html:77
+msgid "Inactive"
+msgstr "Inactif"
+
+#: finance/templates/finance/settings.html:95
+msgid "No templates yet. Add your Rent or Internet bill!"
+msgstr "Pas encore de modèles. Ajoutez votre Loyer ou facture Internet !"
+
+#: finance/templates/finance/signup.html:5
+#: finance/templates/finance/signup.html:39
+msgid "Sign Up"
+msgstr "S'inscrire"
+
+#: finance/templates/finance/signup.html:14
+msgid "Create Account"
+msgstr "Créer un Compte"
+
+#: finance/templates/finance/signup.html:15
+msgid "Join to start tracking your finances"
+msgstr "Rejoignez-nous pour suivre vos finances"
+
+#: finance/templates/finance/signup.html:23
+msgid "Please fix the errors:"
+msgstr "Veuillez corriger les erreurs :"
+
+#: finance/templates/finance/signup.html:40
+msgid "Already have an account? Login"
+msgstr "Déjà un compte ? Connexion"
+
+#: finance_project/settings.py:19
+msgid "English"
+msgstr "Anglais"
+
+#: finance_project/settings.py:20
+msgid "French"
+msgstr "Français"
+
+#: templates/base.html:36
+msgid "© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed."
+msgstr "© 2025 Va8ti. Conçu & Réalisé par Souleimane Cheikh ahmed."

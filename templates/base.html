@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {%load static%}
+{% load i18n %}
 <html lang="en">
 <head>
 
@@ -32,7 +33,7 @@
     <footer class="main-footer">
         <div class="footer-content">
             {% block footer_content %}
-            <p>© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed.</p>
+            <p>{% trans "© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed." %}</p>
             {% endblock %}
         </div>
     </footer>
