@@ -12,7 +12,8 @@ body {
 
 /* --- 2. HEALTH BAR (Professional Dark Mode) --- */
 .health-bar-container {
-    background-color: #111827;
+    background-color: #1e293b;
+    /* #111827; */
     /* Deep Charcoal/Black */
     color: white;
     display: flex;
