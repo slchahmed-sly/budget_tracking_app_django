@@ -11,54 +11,279 @@ body {
 }
 
 /* --- 2. HEALTH BAR (Professional Dark Mode) --- */
-.health-bar-container {
-    background-color: #1e293b;
-    /* #111827; */
-    /* Deep Charcoal/Black */
+/* --- 2. CONTROL CENTER HEADER --- */
+
+.control-center-container {
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    /* Deep Slate Gray Gradient */
     color: white;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 20px 30px 40px 30px;
+    /* Extra bottom padding for bar */
     margin-bottom: 40px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-bottom-left-radius: 32px;
+    border-bottom-right-radius: 32px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
 }
 
-.stat-box {
-    text-align: center;
-    padding: 0 15px;
+/* Sections */
+.cc-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
 }
 
-.stat-box .label {
-    display: block;
+/* --- LEFT: CIRCULAR GAUGE --- */
+.usage-gauge {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: conic-gradient(#3b82f6 var(--gauge-deg),
+            #334155 var(--gauge-deg));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+.gauge-inner {
+    width: 68px;
+    height: 68px;
+    background-color: #0f172a;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.gauge-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+.gauge-label {
+    font-size: 0.6rem;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+/* --- CENTER: MAIN NUMBERS --- */
+.cc-center {
+    flex: 2;
+    /* Takes more space */
+}
+
+.main-label {
     font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    margin-bottom: 5px;
     font-weight: 600;
-    color: #9ca3af;
-    /* Muted gray label */
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
 }
 
-.stat-box .value {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: 600;
+.main-number {
+    font-size: 3.5rem;
+    font-weight: 800;
     color: #ffffff;
+    line-height: 1;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-.stat-box small {
+/* Status Pill */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 10px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+/* Healthy State */
+.status-safe {
+    color: #4ade80;
+    /* Bright Green */
+    background-color: rgba(74, 222, 128, 0.1);
+    border-color: rgba(74, 222, 128, 0.2);
+}
+
+.status-safe .status-dot {
+    background-color: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+}
+
+/* Tight State */
+.status-danger {
+    color: #f87171;
+    /* Red */
+    background-color: rgba(248, 113, 113, 0.1);
+    border-color: rgba(248, 113, 113, 0.2);
+}
+
+.status-danger .status-dot {
+    background-color: #f87171;
+    box-shadow: 0 0 8px #f87171;
+}
+
+
+/* --- RIGHT: TOTAL SOLDE --- */
+.cc-right .sub-label {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.cc-right .sub-number {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #e2e8f0;
+}
+
+.cc-right small {
     font-size: 0.5em;
     opacity: 0.7;
-    font-weight: 400;
 }
 
-/* The Daily Allowance "Gold" Highlight */
-.main-stat .value {
-    font-size: 2.5rem;
-    color: #fbbf24;
-    /* Amber/Gold */
-    font-weight: 700;
+/* --- BOTTOM: SAFETY BAR REMOVED --- */
+
+/* --- RIGHT SIDE GROUP REMOVED (Reverted to specific positioning) --- */
+
+/* Specific tweaks for layout */
+.cc-center {
+    align-items: center;
+}
+
+.cc-right {
+    align-items: center;
+}
+
+
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+    .control-center-container {
+        flex-direction: row;
+        /* Horizontal! */
+        justify-content: space-between;
+        align-items: center;
+        text-align: center;
+        gap: 5px;
+        /* Minimal gap to fit everything */
+        padding: 20px 15px;
+        /* Tighter padding */
+        border-radius: 0 0 24px 24px;
+    }
+
+    /* LEFT: Gauge */
+    .cc-left {
+        flex: 1 1 0px;
+        /* Strict equal width */
+        min-width: 0;
+        /* Allow shrinking if needed */
+        display: flex;
+        justify-content: flex-start;
+        /* Align Left */
+        align-items: center;
+        /* Left padding is handled by container, no extra shift */
+    }
+
+    .usage-gauge {
+        width: 55px;
+        /* Small gauge */
+        height: 55px;
+        margin: 0;
+        /* Align perfectly left */
+    }
+
+    .gauge-inner {
+        width: 45px;
+        height: 45px;
+    }
+
+    .gauge-value {
+        font-size: 0.8rem;
+    }
+
+    .gauge-label {
+        font-size: 0.5rem;
+    }
+
+    /* CENTER: Daily + Pill */
+    .cc-center {
+        flex: 1 1 0px;
+        /* Strict equal width */
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* Center Align */
+        justify-content: center;
+    }
+
+    /* Text Adjustments */
+    .main-label {
+        display: none;
+    }
+
+    .main-number {
+        font-size: 2rem;
+        /* Restore slightly larger size for center dominance */
+        line-height: 1;
+        text-align: center;
+        width: 100%;
+    }
+
+    .status-pill {
+        margin-top: 4px;
+        padding: 2px 8px;
+        font-size: 0.65rem;
+        white-space: nowrap;
+    }
+
+    /* RIGHT: Balance */
+    .cc-right {
+        flex: 1 1 0px;
+        /* Strict equal width */
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        /* Align Right */
+        justify-content: center;
+        /* Right padding is handled by container */
+    }
+
+    .cc-right .sub-label {
+        display: none;
+    }
+
+    .cc-right .sub-number {
+        font-size: 1rem;
+        font-weight: 600;
+        opacity: 0.9;
+        text-align: right;
+    }
 }
 
 /* --- 3. LAYOUT GRID --- */

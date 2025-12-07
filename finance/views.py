@@ -54,12 +54,31 @@ class DashBoardView(LoginRequiredMixin,View):
         potential_budget = potential_total_incomes - potential_total_expenses
         potential_daily_allowance = round(potential_budget / rest_of_days)
 
+        # --- SAFETY LOGIC & GAUGE DATA ---
+        metric_min_safe_balance = rest_of_days * 150
+        is_safe = main_budget > metric_min_safe_balance
+        budget_status = "Healthy" if is_safe else "Tight" # or "Danger"
+
+        # Circular Gauge (Days Remaining)
+        # 30 day cycle standard. 
+        # If remaining = 30, 100% (360 degrees) -> Actually we want "elapsed" or "remaining"? 
+        # User asked for "Days Remaining" in gauge. Usually full circle = full month?
+        # Let's map 30 days -> 360deg. 
+        # If 15 days left -> 180deg.
+        days_progress_degrees = (rest_of_days / 30) * 360
+
+
         return render(request, 'finance/dashboard.html', {
             'main_budget': main_budget,
             'main_daily_allowance': main_daily_allowance,
             
             'potential_budget': potential_budget,
             'potential_daily_allowance': potential_daily_allowance,
+
+            'metric_min_safe_balance': metric_min_safe_balance,
+            'budget_status': budget_status,
+            'is_safe': is_safe,
+            'days_progress_degrees': days_progress_degrees,
 
             'remaining_days': rest_of_days,
             'cycle_currency': current_cycle.currency_symbol,

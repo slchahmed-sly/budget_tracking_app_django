@@ -10,20 +10,27 @@
 
 {% block content %}
 
-<div class="health-bar-container">
-    <div class="stat-box">
-        <span class="label">{% trans "Balance" %}</span>
-        <span class="value">{{ main_budget }} <small style="font-size:0.6em;">{{ cycle_currency }}</small></span>
-    </div>
-    
-    <div class="stat-box main-stat">
-        <span class="label">{% trans "Daily Allowance" %}</span>
-        <span class="value">{{ main_daily_allowance }}</span>
+<div class="control-center-container">
+    <!-- LEFT: Circular Gauge (Days Remaining) -->
+    <div class="cc-section cc-left">
+        <div class="usage-gauge" style="--gauge-deg: {{ days_progress_degrees }}deg;">
+            <div class="gauge-inner">
+                <span class="gauge-value">{{ remaining_days }}</span>
+                <span class="gauge-label">{% trans "DAYS" %}</span>
+            </div>
+        </div>
     </div>
 
-    <div class="stat-box">
-        <span class="label">{% trans "Days Left" %}</span>
-        <span class="value">{{ remaining_days }}</span>
+    <!-- CENTER: Daily Allocation + Status Pill -->
+    <div class="cc-section cc-center">
+        <span class="main-label">{% trans "DAILY ALLOCATION" %}</span>
+        <div class="main-number">{{ main_daily_allowance }}</div>
+    </div>
+
+    <!-- RIGHT: Total Balance -->
+    <div class="cc-section cc-right">
+        <span class="sub-label">{% trans "TOTAL SOLDE" %}</span>
+        <div class="sub-number">{{ main_budget }} <small>{{ cycle_currency }}</small></div>
     </div>
 </div>
 
