@@ -23,14 +23,18 @@
 </head>
 <body>
 
-    {% block content %}
+    <div class="main-content">
+        {% block content %}
 
-    {% endblock %}
+        {% endblock %}
+    </div>
     
     <footer class="main-footer">
-        {% block footer_content %}
-        <p>© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed.</p>
-        {% endblock %}
+        <div class="footer-content">
+            {% block footer_content %}
+            <p>© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed.</p>
+            {% endblock %}
+        </div>
     </footer>
 
 </body>
