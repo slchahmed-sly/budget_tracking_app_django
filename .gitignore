@@ -28,3 +28,6 @@ venv.bak/
 .idea/
 *.swp
 .DS_Store
+
+staticfiles/
+
