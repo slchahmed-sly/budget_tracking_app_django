@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Sign Up" %}{% endblock %}
+
+{% block css_styling %}
+    <link rel="stylesheet" href="{% static 'finance/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-panel auth-blue">
+    <div class="panel-header">
+        <h2>{% trans "Create Account" %}</h2>
+        <p>{% trans "Join to start tracking your finances" %}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <div class="error-box" style="background:#fee2e2; color:#b91c1c; padding:15px; border-radius:8px; margin-bottom:20px;">
+                <p style="font-weight:bold;">{% trans "Please fix the errors:" %}</p>
+                {{ form.errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label class="field-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <small style="color:#6b7280; display:block; margin-top:5px;">{{ field.help_text }}</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save btn-auth">{% trans "Sign Up" %}</button>
+            <a href="{% url 'login' %}" class="btn-cancel">{% trans "Already have an account? Login" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block footer_content %}
+<p>© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed. A Data Scientist, Software Engineer, Cloud Architect and AI Engineer</p>
+{% endblock %}

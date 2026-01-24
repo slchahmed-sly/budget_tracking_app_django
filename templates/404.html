@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block css_styling %}
+<link rel="stylesheet" href="{% static '404.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-404">
+    <div class="glass-card">
+        <h1 class="title-404">404 Page Not Found</h1>
+        <div class="image-wrapper">
+            <img src="{% static 'images/Subject 2.png' %}" alt="404 Illustration" class="image-404">
+        </div>
+        <p class="text-404">
+            أنا رياح فين ؟  أنا راااجع تاني<br>
+            please click this button to return to the home page
+        </p>
+        <a href="{% url 'home' %}" class="btn-home">
+            Return to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

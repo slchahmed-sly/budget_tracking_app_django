@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Edit Template" %}{% endblock %}
+
+{% block css_styling %}
+    <link rel="stylesheet" href="{% static 'finance/recurring_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-panel">
+    <div class="panel-header">
+        <h2>{% trans "Edit Template" %}</h2>
+        <p>{% trans "Update this blueprint for future cycles." %}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <div class="error-box">
+                <p>{% trans "Please fix the errors below:" %}</p>
+                {{ form.errors }}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label class="field-label">{% trans "Purpose / Title" %}</label>
+            {{ form.purpose }}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group main-amount">
+                <label class="field-label">{% trans "Amount" %} (TL)</label>
+                {{ form.amount }}
+            </div>
+        </div>
+
+        <div class="form-group checkbox-group">
+             {{ form.is_active }}
+             <label for="{{ form.is_active.id_for_label }}">
+                 {% trans "Active (Include in next cycle?)" %}
+             </label>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">{% trans "Update Template" %}</button>
+            <a href="{% url 'settings' %}" class="btn-cancel">{% trans "Cancel" %}</a>
+        </div>
+
+        <div class="delete-section">
+            <a href="{% url 'delete_recurring' form.instance.pk %}" class="btn-delete">{% trans "Delete this template" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

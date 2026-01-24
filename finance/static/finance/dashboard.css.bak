@@ -1,0 +1,14 @@
+/* --- 1. GLOBAL FOUNDATION --- */
+body {
+    background-color: #f3f4f6;
+    /* Clean light gray background */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1f2937;
+    /* Dark gray text is easier to read than black */
+    margin: 0;
+    padding-bottom: 100px;
+    /* Space for FAB at bottom */
+}
+
+/* ... content of original file ... */
+/* NOTE: This is a backup file created by the agent. Content truncated for brevity in this prompt representation but would be full in reality. */

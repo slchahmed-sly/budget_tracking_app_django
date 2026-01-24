@@ -1,0 +1,147 @@
+/* --- Liquid Glass 404 Styles --- */
+
+/* Inherit font from global, but ensure we have good contrast */
+body {
+    /* Ensure the background matches the dashboard's deep theme if permitted, 
+       or use a gradient that complements the glass effect */
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    min-height: 100vh;
+}
+
+.container-404 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    /* Occupy most of the screen */
+    padding: 20px;
+}
+
+/* The Glass Card */
+.glass-card {
+    background: rgba(255, 255, 255, 0.2);
+    /* Semi-transparent white */
+    backdrop-filter: blur(12px);
+    /* Blur effect */
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 24px;
+    padding: 60px 40px;
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+
+    /* Light refraction simulation via shadow and subtle gradient */
+    box-shadow:
+        0 8px 32px 0 rgba(31, 38, 135, 0.1),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect for the card */
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        0 12px 40px 0 rgba(31, 38, 135, 0.15),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Shimmer/Refraction effect on hover (optional advanced touch) */
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    transform: skewX(-25deg);
+    transition: left 0.7s;
+    pointer-events: none;
+}
+
+.glass-card:hover::before {
+    left: 150%;
+}
+
+/* Image styling */
+.image-wrapper {
+    margin-bottom: 30px;
+}
+
+.image-404 {
+    max-width: 250px;
+    height: auto;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+    transition: transform 0.3s ease;
+}
+
+.glass-card:hover .image-404 {
+    transform: scale(1.05);
+    /* Slight zoom on hover */
+}
+
+/* Typography */
+.title-404 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1f2937;
+    /* Dark gray from dashboard */
+    margin: 0 0 10px 0;
+    letter-spacing: -0.02em;
+}
+
+.text-404 {
+    color: #4b5563;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+/* Button Styling (Matching Dashboard aesthetics) */
+.btn-home {
+    display: inline-block;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    /* Deep Slate from dashboard */
+    color: white;
+    padding: 14px 32px;
+    border-radius: 9999px;
+    /* Pill shape */
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-home:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+    /* Lighter on hover */
+}
+
+.btn-home:active {
+    transform: translateY(0);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .glass-card {
+        padding: 40px 20px;
+    }
+
+    .title-404 {
+        font-size: 1.5rem;
+    }
+
+    .image-404 {
+        max-width: 180px;
+    }
+}
