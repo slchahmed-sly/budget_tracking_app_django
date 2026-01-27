@@ -35,26 +35,35 @@
 </div>
 
 <!-- AI Advice Section (New Location) -->
-{% if ai_advice %}
+<!-- AI Advice Section (On Demand) -->
 <div class="ai-glass-container">
     <div class="ai-glass-card collapsed" id="aiCard">
-        <div class="ai-card-header" onclick="toggleAiCard()">
+        <div class="ai-card-header">
             <div class="header-content">
-                <div class="pulsing-indicator"></div>
+                <div class="pulsing-indicator" id="aiStatusIndicator"></div>
                 <span class="ai-title"><i class="fas fa-magic mr-2"></i>{% trans "AI Financial Insights" %}</span>
             </div>
-            <div class="toggle-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
+            
+            <div class="header-actions">
+                <button id="aiAskBtn" class="ai-ask-btn" onclick="fetchAiAdvice(event)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                    </svg>
+                    {% trans "Ask AI" %}
+                </button>
+
+                <div class="toggle-icon" id="aiToggleIcon" style="display: none;" onclick="toggleAiCard()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </div>
             </div>
         </div>
         <div class="ai-card-content">
-            <div class="ai-response-text" id="aiResponseText" data-full-text="{{ ai_advice }}"></div>
+            <div class="ai-response-text" id="aiResponseText"></div>
         </div>
     </div>
 </div>
-{% endif %}
 
 <div class="ledger-grid">
     <div class="ledger-column">
@@ -328,40 +337,72 @@
         fabs.forEach(fab => fab.classList.remove('active'));
     });
 
-    /* --- AI TYPEWRITER LOGIC --- */
+    /* --- AI TYPEWRITER LOGIC & FETCH --- */
     let aiTypewriterTimeout;
     
+    // Toggle function for manual expand/collapse after loading
     function toggleAiCard() {
         const card = document.getElementById('aiCard');
-        const textContainer = document.getElementById('aiResponseText');
-        const fullText = textContainer.getAttribute('data-full-text');
-        
         card.classList.toggle('expanded');
+    }
+
+    async function fetchAiAdvice(event) {
+        event.stopPropagation();
         
-        if (card.classList.contains('expanded')) {
-            // Start Typing
-            textContainer.innerHTML = ''; // Clear previous
-            typeWriter(textContainer, fullText, 0);
-        } else {
-            // Stop Typing and Clear
-            clearTimeout(aiTypewriterTimeout);
-            textContainer.innerHTML = ''; 
+        const btn = document.getElementById('aiAskBtn');
+        const indicator = document.getElementById('aiStatusIndicator');
+        const textContainer = document.getElementById('aiResponseText');
+        const card = document.getElementById('aiCard');
+        const toggleIcon = document.getElementById('aiToggleIcon');
+
+        // 1. Prepare UI for loading
+        btn.disabled = true;
+        // Keep button width consistent or add "..."
+        const originalBtnText = btn.innerHTML;
+        btn.innerHTML = `<span class="spinner"></span> {% trans "Thinking..." %}`;
+        
+        indicator.classList.add('urgent'); // Example class for faster pulse
+        textContainer.innerHTML = '';
+        card.classList.remove('expanded'); // Ensure closed while loading
+        toggleIcon.style.display = 'none';
+
+        try {
+            // 2. Fetch from API
+            const response = await fetch("{% url 'get_ai_advice' %}");
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+
+            if (data.advice) {
+                // 3. Success State
+                // Hide button, show toggle
+                btn.style.display = 'none'; 
+                toggleIcon.style.display = 'block';
+
+                // Open Card
+                card.classList.add('expanded');
+                
+                // Start Typing
+                typeWriter(textContainer, data.advice, 0);
+
+            } else {
+                // API Logic Error
+                btn.innerHTML = "{% trans 'Error. Try Again' %}";
+                btn.disabled = false;
+            }
+
+        } catch (error) {
+            console.error('AI Fetch Error:', error);
+            btn.innerHTML = "{% trans 'Error. Try Again' %}";
+            btn.disabled = false;
+        } finally {
+            indicator.classList.remove('urgent');
         }
     }
 
     function typeWriter(element, text, index) {
         if (index < text.length) {
-            // Handle newlines efficiently by treating them as HTML breaks if needed, 
-            // but textContent usually handles \n as whitespace. 
-            // For properly formatted paragraphs, we might need a parser, but simply appending text works for basic cases.
-            // If the backend sends pure text with \n, using innerText or pre-wrap CSS is best.
-            // Here we append char by char.
-            
             element.textContent += text.charAt(index);
-            
-            // Randomize typing speed slightly for realism (30ms - 70ms)
             const speed = Math.random() * (50 - 20) + 20;
-            
             aiTypewriterTimeout = setTimeout(() => {
                 typeWriter(element, text, index + 1);
             }, speed);

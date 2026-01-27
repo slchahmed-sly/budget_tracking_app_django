@@ -16,6 +16,9 @@ def get_financial_advice(context_data):
             f"Role: You are a sharp financial detective. You have access to the user's full transaction history. "
             f"Your goal is to calculate the hard numbers AND find hidden insights in the comments.\n\n"
             
+            f"=== LANGUAGE ===\n"
+            f"IMPORTANT: You must respond in the following language: {context_data.get('language', 'en')}"
+            
             f"=== DATA ===\n"
             f"Days Left: {context_data['remaining_days']}\n"
             f"Current Cash: {context_data['main_budget']} {context_data['currency']}\n"
@@ -38,7 +41,8 @@ def get_financial_advice(context_data):
             f"- If the comments are empty or boring, just say 'No specific notes found in ledger.'\n\n"
             
             f"SECTION 3: VERDICT\n"
-            f"- One sentence summary of their financial health."
+            f"- One sentence summary of their financial health.\n\n"
+            
         )
 
         response = client.models.generate_content(

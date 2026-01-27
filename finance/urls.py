@@ -22,6 +22,8 @@ urlpatterns = [
     path("edit/special/<int:pk>",views.EditSpecialView.as_view(),name='edit_special'),
     path("delete/special/<int:pk>",views.DeleteSpecialView.as_view(),name='delete_special'),
     path("convert/special/<int:pk>",views.ConvertSpecialView.as_view(),name='convert_special'),
+    # --- AI API ---
+    path("api/get-ai-advice/", views.GetAIAdviceView.as_view(), name='get_ai_advice'),
     # --- Auth Routes ---
     path('signup/', views.SignupView.as_view(), name='signup'),
     path('login/', LoginView.as_view(template_name='finance/login.html'), name='login'),

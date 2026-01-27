@@ -14,6 +14,65 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 def get_active_cycle(user):
     return models.Cycle.objects.filter(user=user).order_by('-start').first()
 
+from django.http import JsonResponse
+class GetAIAdviceView(LoginRequiredMixin, View):
+    def get(self, request):
+        active_cycle = get_active_cycle(request.user)
+        if not active_cycle:
+            return JsonResponse({'error': 'No active cycle found.'}, status=400)
+        
+        # Gather data for AI
+        incomes = models.Income.objects.filter(cycle=active_cycle).order_by('-amount')
+        expenses = models.Expense.objects.filter(cycle=active_cycle).order_by('-amount')
+        
+        # Calculate totals
+        total_incomes = sum(i.amount for i in incomes if i.amount)
+        total_expenses = sum(i.amount for i in expenses if i.amount)
+        
+        cycle_end_date = active_cycle.start + timedelta(days=30)
+        today = date.today()
+        rest_of_days = (cycle_end_date - today).days
+        if rest_of_days < 1: rest_of_days = 1
+        
+        main_budget = total_incomes - total_expenses
+        daily_allowance = round(main_budget / rest_of_days)
+        
+        uncertain_total = sum(i.amount for i in incomes if i.status != 'certain')
+        debt_total = sum(i.amount for i in incomes if i.owe_me)
+        
+        # Build Ledger
+        ledger_lines = []
+        for inc in incomes:
+            status = f"({inc.status})"
+            owe = " [OWE ME]" if inc.owe_me else ""
+            note = f" [Note: {inc.comment}]" if inc.comment else ""
+            ledger_lines.append(f"Income: {inc.source}, {inc.amount} {active_cycle.currency_symbol} {status}{owe}{note}")
+            
+        for exp in expenses:
+            owe = " [I OWE]" if exp.i_owe else ""
+            note = f" [Note: {exp.comment}]" if exp.comment else ""
+            ledger_lines.append(f"Expense: {exp.purpose}, {exp.amount} {active_cycle.currency_symbol}{owe}{note}")
+            
+        full_ledger_text = "\n".join(ledger_lines)
+        print(request.LANGUAGE_CODE)
+        ai_context = {
+            'remaining_days': rest_of_days,
+            'main_budget': main_budget,
+            'daily_allowance': daily_allowance,
+            'currency': active_cycle.currency_symbol,
+            'uncertain_total': uncertain_total,
+            'debt_total': debt_total,
+            'full_ledger': full_ledger_text,
+            'language': request.LANGUAGE_CODE,
+        }
+        
+        try:
+            advice = ai_utils.get_financial_advice(ai_context)
+            return JsonResponse({'advice': advice})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+
 
 
 class DashBoardView(LoginRequiredMixin, View):
@@ -55,50 +114,7 @@ class DashBoardView(LoginRequiredMixin, View):
         potential_budget = potential_total_incomes - potential_total_expenses
         potential_daily_allowance = round(potential_budget / rest_of_days)
 
-        # --- AI ADVISOR DATA PREPARATION ---
-        # 1. Calculate Risk Totals
-        uncertain_total = sum(i.amount for i in incomes if i.status != 'certain')
-        debt_total = sum(i.amount for i in incomes if i.owe_me)
 
-        # 2. Build the "Full Ledger" Text
-        # This converts every transaction into a readable line for the AI
-        ledger_lines = []
-        
-        for inc in incomes:
-            # Format: "Income: Salary, 5000 TL (Certain) [Comment: Bonus for project]"
-            status_note = f"({inc.status})"
-            owe_note = " [OWE ME]" if inc.owe_me else ""
-            comment_note = f" [Note: {inc.comment}]" if inc.comment else ""
-            line = f"Income: {inc.source}, {inc.amount} {current_cycle.currency_symbol} {status_note}{owe_note}{comment_note}"
-            ledger_lines.append(line)
-
-        for exp in expenses:
-            # Format: "Expense: Rent, 2000 TL [Comment: Paid early]"
-            owe_note = " [I OWE]" if exp.i_owe else ""
-            comment_note = f" [Note: {exp.comment}]" if exp.comment else ""
-            line = f"Expense: {exp.purpose}, {exp.amount} {current_cycle.currency_symbol}{owe_note}{comment_note}"
-            ledger_lines.append(line)
-
-        full_ledger_text = "\n".join(ledger_lines)
-
-        # 3. Build Context
-        ai_context = {
-            'remaining_days': rest_of_days,
-            'main_budget': main_budget,
-            'daily_allowance': main_daily_allowance,
-            'currency': current_cycle.currency_symbol,
-            'uncertain_total': uncertain_total,
-            'debt_total': debt_total,
-            'full_ledger': full_ledger_text, # <--- Passing the full history now
-        }
-
-        # 4. Call the AI
-        ai_advice = ""
-        try:
-            ai_advice = ai_utils.get_financial_advice(ai_context)
-        except Exception as e:
-            print(f"AI Failed: {e}") 
-            ai_advice = "Advisor unavailable."
 
         return render(request, 'finance/dashboard.html', {
             'main_budget': main_budget,
@@ -113,7 +129,7 @@ class DashBoardView(LoginRequiredMixin, View):
             'expenses': expenses,
             'specials': specials,
             
-            'ai_advice': ai_advice,
+
 
             'total_incomes': total_incomes,
             'total_expenses': total_expenses,
