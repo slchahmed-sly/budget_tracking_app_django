@@ -28,8 +28,8 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.up.railway.app',
-    'va8ti.com'
-    'www.va8ti.com'
+    'va8ti.com',
+    'www.va8ti.com',
 ]
 
 
