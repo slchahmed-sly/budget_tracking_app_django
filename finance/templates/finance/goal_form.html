@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Savings goal" %}{% endblock %}
+
+{% block content %}
+<a href="{% url 'savings' %}" class="back-link">← {% trans "Back" %}</a>
+
+<form method="post" class="sheet" novalidate>
+    {% csrf_token %}
+    <h1>{% if obj %}{{ obj.name }}{% else %}{% trans "New savings goal" %}{% endif %}</h1>
+
+    <div class="field">
+        <label for="{{ form.name.id_for_label }}">{% trans "What are you saving for?" %}</label>
+        {{ form.name }}
+        {{ form.name.errors }}
+    </div>
+    <div class="field">
+        <label for="{{ form.target.id_for_label }}">{% trans "Target amount" %}</label>
+        {{ form.target }}
+        {{ form.target.errors }}
+    </div>
+    <div class="field">
+        <label for="{{ form.monthly_amount.id_for_label }}">{% trans "Amount per cycle" %}</label>
+        {{ form.monthly_amount }}
+        <div class="help">{% trans "Suggested each time you start a new cycle. You can change it then." %}</div>
+        {{ form.monthly_amount.errors }}
+    </div>
+    <div class="field">
+        <label for="{{ form.deadline.id_for_label }}">{% trans "Deadline (optional)" %}</label>
+        {{ form.deadline }}
+        {{ form.deadline.errors }}
+    </div>
+
+    <div class="actions">
+        {% if obj %}
+        <a href="{% url 'delete_goal' obj.pk %}" class="btn btn-danger">{% trans "Delete" %}</a>
+        {% else %}
+        <a href="{% url 'savings' %}" class="btn btn-outline">{% trans "Cancel" %}</a>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+    </div>
+</form>
+{% endblock %}

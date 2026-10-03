@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load i18n money %}
+
+{% block title %}{% if entry %}{% trans "Edit" %}{% else %}{% trans "Add" %}{% endif %}{% endblock %}
+
+{% block content %}
+<a href="{% url 'home' %}" class="back-link">← {% trans "Back" %}</a>
+
+<form method="post" class="sheet" id="entryForm" novalidate>
+    {% csrf_token %}
+    <h1>{% if entry %}{{ entry.title }}{% else %}{% trans "Add to this cycle" %}{% endif %}</h1>
+
+    {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+
+    <div class="field">
+        <span class="field-label">{% trans "Type" %}</span>
+        <div class="segmented kind">{{ form.kind }}</div>
+        {{ form.kind.errors }}
+    </div>
+
+    <div class="field">
+        <label for="{{ form.title.id_for_label }}">{% trans "What is it?" %}</label>
+        {{ form.title }}
+        {{ form.title.errors }}
+    </div>
+
+    <div class="field">
+        <label for="{{ form.amount.id_for_label }}">{% trans "Amount" %}</label>
+        <div class="big-amount" id="amountBox">
+            {{ form.amount }}
+            <span>{{ cycle.currency_symbol }}</span>
+        </div>
+        {% if entry.previous_amount is not None %}
+        <div class="help">{% blocktrans with amount=entry.previous_amount|money %}Was {{ amount }} · you can change it any time during the cycle{% endblocktrans %}</div>
+        {% else %}
+        <div class="help">{% trans "You can change it any time during the cycle." %}</div>
+        {% endif %}
+        {{ form.amount.errors }}
+    </div>
+
+    <div class="field">
+        <span class="field-label">{% trans "How sure is it?" %}</span>
+        <div class="segmented certainty">{{ form.certainty }}</div>
+        <div class="help">{% trans "Probable and uncertain items are kept aside until you confirm them." %}</div>
+        {{ form.certainty.errors }}
+    </div>
+
+    <label class="check-row">
+        <span>{% trans "Already received or paid" %}</span>
+        {{ form.is_done }}
+    </label>
+
+    <label class="check-row">
+        <span>{% trans "It's a debt (I owe it, or it's owed to me)" %}</span>
+        {{ form.is_debt }}
+    </label>
+
+    <div class="field">
+        <label for="{{ form.comment.id_for_label }}">{% trans "Note" %}</label>
+        {{ form.comment }}
+    </div>
+
+    {% if entry %}
+    <div class="impact" id="impact" hidden>
+        <span>{% trans "Free money" %} <b id="impactDelta"></b></span>
+        <strong id="impactDay"></strong>
+    </div>
+    {% endif %}
+
+    <div class="actions">
+        {% if entry %}
+        <a href="{% url 'delete_entry' entry.pk %}" class="btn btn-danger">{% trans "Delete" %}</a>
+        {% else %}
+        <a href="{% url 'home' %}" class="btn btn-outline">{% trans "Cancel" %}</a>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">{% if entry %}{% trans "Save change" %}{% else %}{% trans "Add" %}{% endif %}</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{% if entry %}{{ impact|json_script:"impactData" }}{% endif %}
+<script>
+(function () {
+    const form = document.getElementById('entryForm');
+    const box = document.getElementById('amountBox');
+    const value = (name) => (form.querySelector('input[name="' + name + '"]:checked') || {}).value;
+
+    function paintKind() {
+        const kind = value('kind');
+        box.classList.toggle('is-income', kind === 'income');
+        box.classList.toggle('is-expense', kind === 'expense');
+    }
+
+    const dataTag = document.getElementById('impactData');
+    const d = dataTag ? JSON.parse(dataTag.textContent) : null;
+    const fmt = (n) => (n < 0 ? '−' : '') + Math.abs(n).toLocaleString(document.documentElement.lang);
+    const contribution = (kind, certainty, amount) =>
+        certainty === 'certain' ? (kind === 'income' ? amount : -amount) : 0;
+
+    function paintImpact() {
+        if (!d) return;
+        const impact = document.getElementById('impact');
+        const amount = parseInt(form.querySelector('input[name="amount"]').value || '0', 10) || 0;
+        let delta = contribution(value('kind'), value('certainty'), amount) - contribution(d.kind, d.certainty, d.amount);
+        if (d.inBalance) delta = 0;  // already paid before the last check-in
+        if (!delta) { impact.hidden = true; return; }
+        const newPerDay = d.hasCheckin
+            ? Math.round((d.freeLeft + delta) / d.daysLeft)
+            : Math.round((d.freeMoney + delta) / d.totalDays);
+        document.getElementById('impactDelta').textContent = (delta > 0 ? '+' : '') + fmt(delta);
+        document.getElementById('impactDay').textContent = fmt(d.perDay) + ' → ' + fmt(newPerDay) + " {% trans '/ day' %}";
+        impact.classList.toggle('is-worse', delta < 0);
+        impact.hidden = false;
+    }
+
+    form.addEventListener('input', function () { paintKind(); paintImpact(); });
+    form.addEventListener('change', function () { paintKind(); paintImpact(); });
+    paintKind();
+    paintImpact();
+})();
+</script>
+{% endblock %}

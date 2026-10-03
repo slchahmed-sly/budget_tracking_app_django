@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete" %}{% endblock %}
+
+{% block content %}
+<form method="post" class="sheet">
+    {% csrf_token %}
+    <h1>{% blocktrans with name=obj %}Delete “{{ name }}”?{% endblocktrans %}</h1>
+    <p class="lead">{% trans "This can't be undone." %}</p>
+    <div class="actions">
+        <a href="{% url cancel_url %}" class="btn btn-outline grow">{% trans "Cancel" %}</a>
+        <button type="submit" class="btn btn-expense grow">{% trans "Delete" %}</button>
+    </div>
+</form>
+{% endblock %}

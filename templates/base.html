@@ -1,42 +1,56 @@
 <!DOCTYPE html>
-{%load static%}
-{% load i18n %}
-<html lang="en">
+{% load static i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
-
-    <link rel="icon" type="image/png" href="{% static 'images/logo.jpeg' %}">
-
-    <meta property="og:image" content="https://www.va8ti.com/static/images/logo.jpeg">
-    
-    <meta property="og:title" content="Va8ti - My Money Manager">
-    <meta property="og:description" content="Securely track your income and expenses.">
-    <link rel="apple-touch-icon" href="{% static 'images/logo.jpeg' %}">
-    <link rel="icon" type="image/png" href="{% static 'images/logo.jpeg' %}">
-    <link rel="icon" type="image/x-icon" href="{% static 'images/logo.jpeg' %}">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'base.css' %}">
-    <title>{% block title %} {% endblock %}</title>
-    {% block css_styling %}
-    
-    {% endblock %}
+    <meta name="theme-color" content="#065F46">
+    <title>{% block title %}va8ti{% endblock %} · va8ti</title>
+
+    <meta property="og:image" content="https://www.va8ti.com/static/images/logo.jpeg">
+    <meta property="og:title" content="Va8ti - My Money Manager">
+    <meta property="og:description" content="Securely track your income and expenses.">
+    <link rel="icon" type="image/jpeg" href="{% static 'images/logo.jpeg' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/logo.jpeg' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'app.css' %}">
 </head>
 <body>
+    {% block body %}
+    <main class="app {% block app_class %}{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
 
-    <div class="main-content">
-        {% block content %}
+    {% if user.is_authenticated %}
+    {% block nav %}
+    <nav class="nav" aria-label="{% trans 'Main' %}">
+        <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+            {% trans "Home" %}
+        </a>
+        <a href="{% url 'savings' %}" {% if request.resolver_match.url_name == 'savings' %}aria-current="page"{% endif %}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>
+            {% trans "Savings" %}
+        </a>
+        <a href="{% url 'settings' %}" {% if request.resolver_match.url_name == 'settings' %}aria-current="page"{% endif %}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+            {% trans "Settings" %}
+        </a>
+    </nav>
+    {% endblock %}
+    {% endif %}
 
+    <footer class="footer">
+        {% block footer_content %}
+        <p>{% trans "© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed." %}</p>
         {% endblock %}
-    </div>
-    
-    <footer class="main-footer">
-        <div class="footer-content">
-            {% block footer_content %}
-            <p>{% trans "© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed." %}</p>
-            {% endblock %}
-        </div>
     </footer>
+    {% endblock %}
 
+    {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load i18n money %}
+
+{% block title %}{% if is_new %}{% trans "Start a new cycle" %}{% else %}{% trans "Edit cycle" %}{% endif %}{% endblock %}
+
+{% block content %}
+<a href="{% if is_new %}{% url 'home' %}{% else %}{% url 'settings' %}{% endif %}" class="back-link">← {% trans "Back" %}</a>
+
+<form method="post" class="sheet" id="cycleForm" novalidate>
+    {% csrf_token %}
+    <h1>{% if is_new %}{% trans "Start a new cycle" %}{% else %}{% trans "Edit cycle" %}{% endif %}</h1>
+    {% if is_new %}<p class="lead">{% trans "Usually from one payday to the next." %}</p>{% endif %}
+
+    {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+
+    <div class="field">
+        <label for="{{ form.title.id_for_label }}">{% trans "Name" %}</label>
+        {{ form.title }}
+        {{ form.title.errors }}
+    </div>
+    <div class="field-row">
+        <div class="field">
+            <label for="{{ form.start.id_for_label }}">{% trans "Starts" %}</label>
+            {{ form.start }}
+            {{ form.start.errors }}
+        </div>
+        <div class="field">
+            <label for="{{ form.end.id_for_label }}">{% trans "Ends" %}</label>
+            {{ form.end }}
+            {{ form.end.errors }}
+        </div>
+    </div>
+    <div class="field">
+        <label for="{{ form.currency_symbol.id_for_label }}">{% trans "Currency" %}</label>
+        {{ form.currency_symbol }}
+        {{ form.currency_symbol.errors }}
+    </div>
+
+    {% if is_new %}
+    {% if recurring %}
+    <div class="field">
+        <span class="field-label">{% trans "Added automatically" %}</span>
+        <div class="rows" style="margin-top: 0">
+            {% for r in recurring %}
+            <div class="row"><div class="row-main"><div class="row-title">{{ r.purpose }}</div></div><b class="text-expense">−{{ r.amount|default:0|money }}</b></div>
+            {% endfor %}
+        </div>
+        <div class="help">{% trans "From your recurring expenses in Settings. You can edit them after starting." %}</div>
+    </div>
+    {% endif %}
+
+    {% if goals %}
+    <div class="field">
+        <span class="field-label">{% trans "How much do you want to save this cycle?" %}</span>
+        <div class="help">{% trans "This is moved from your balance into your goals. It counts as an expense, so it is never part of your free money." %}</div>
+    </div>
+    {% for goal in goals %}
+    <div class="field">
+        <label for="goal_{{ goal.pk }}">{{ goal.name }} <span class="text-muted">· {% blocktrans with saved=goal.saved|money target=goal.target|money %}{{ saved }} of {{ target }}{% endblocktrans %}</span></label>
+        <div class="bar"><div style="width: {{ goal.percent }}%"></div></div>
+        <input type="number" inputmode="numeric" min="0" name="goal_{{ goal.pk }}" id="goal_{{ goal.pk }}" value="{{ goal.monthly_amount }}">
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary btn-block">{% if is_new %}{% trans "Start cycle" %}{% else %}{% trans "Save" %}{% endif %}</button>
+</form>
+{% endblock %}

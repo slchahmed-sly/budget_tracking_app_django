@@ -1,52 +1,71 @@
-from django import forms 
+from django import forms
+from django.utils.translation import gettext_lazy as _
+
 from . import models
+
 
 class CycleForm(forms.ModelForm):
     class Meta:
         model = models.Cycle
-        exclude = ['user']
+        fields = ['title', 'start', 'end', 'currency_symbol']
         widgets = {
-            'currency_symbol': forms.TextInput(attrs={'placeholder': 'e.g. TL, USD'}),
-            'start': forms.DateInput(attrs={'type': 'date'}),
+            'title': forms.TextInput(attrs={'placeholder': _('e.g. October')}),
+            'start': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+            'end': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+            'currency_symbol': forms.TextInput(attrs={'placeholder': _('e.g. TL, USD')}),
         }
-        labels = {
-            'currency_symbol': 'Currency Name'
+
+    def clean(self):
+        cleaned = super().clean()
+        start, end = cleaned.get('start'), cleaned.get('end')
+        if start and end and end < start:
+            self.add_error('end', _('The end date must be after the start date.'))
+        return cleaned
+
+
+class EntryForm(forms.ModelForm):
+    class Meta:
+        model = models.Entry
+        fields = ['kind', 'title', 'amount', 'certainty', 'is_done', 'is_debt', 'comment']
+        widgets = {
+            'kind': forms.RadioSelect,
+            'certainty': forms.RadioSelect,
+            'amount': forms.NumberInput(attrs={'inputmode': 'numeric', 'min': 0}),
+            'comment': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
+class CheckInForm(forms.ModelForm):
+    class Meta:
+        model = models.CheckIn
+        fields = ['balance']
+        widgets = {
+            'balance': forms.NumberInput(attrs={'inputmode': 'numeric', 'autofocus': True}),
         }
 
 
 class RecurringExpenseForm(forms.ModelForm):
     class Meta:
         model = models.RecurringExpense
-        exclude = ['user']
-
-
-class ExpenseForm(forms.ModelForm):
-    class Meta:
-        model = models.Expense
-        exclude = ['cycle']
+        fields = ['purpose', 'amount', 'is_active']
         widgets = {
-            # This is the Magic Line: Turn the dropdown into Radio Buttons
-            'status': forms.RadioSelect, 
-            'comment': forms.Textarea(attrs={'rows': 3}),
+            'amount': forms.NumberInput(attrs={'inputmode': 'numeric', 'min': 0}),
         }
 
 
-
-class IncomeForm(forms.ModelForm):
+class SavingsGoalForm(forms.ModelForm):
     class Meta:
-        model = models.Income
-        exclude = ['cycle']
+        model = models.SavingsGoal
+        fields = ['name', 'target', 'monthly_amount', 'deadline']
         widgets = {
-            # This is the Magic Line: Turn the dropdown into Radio Buttons
-            'status': forms.RadioSelect, 
-            'comment': forms.Textarea(attrs={'rows': 3}),
+            'target': forms.NumberInput(attrs={'inputmode': 'numeric', 'min': 0}),
+            'monthly_amount': forms.NumberInput(attrs={'inputmode': 'numeric', 'min': 0}),
+            'deadline': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
         }
 
-class SpecialForm(forms.ModelForm):
-    class Meta:
-        model = models.Special
-        exclude = ['cycle']
-        widgets = {
-            'type': forms.RadioSelect,
-            'comment': forms.Textarea(attrs={'rows': 3}),
-        }
+
+class TransferForm(forms.Form):
+    amount = forms.IntegerField(
+        label=_('Amount'), min_value=1,
+        widget=forms.NumberInput(attrs={'inputmode': 'numeric', 'autofocus': True}),
+    )
