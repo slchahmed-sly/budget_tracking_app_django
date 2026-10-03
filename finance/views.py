@@ -37,8 +37,8 @@ class GetAIAdviceView(LoginRequiredMixin, View):
         main_budget = total_incomes - total_expenses
         daily_allowance = round(main_budget / rest_of_days)
         
-        uncertain_total = sum(i.amount for i in incomes if i.status != 'certain')
-        debt_total = sum(i.amount for i in incomes if i.owe_me)
+        uncertain_total = sum(i.amount for i in incomes if i.amount and i.status != 'certain')
+        debt_total = sum(i.amount for i in incomes if i.amount and i.owe_me)
         
         # Build Ledger
         ledger_lines = []
@@ -54,7 +54,6 @@ class GetAIAdviceView(LoginRequiredMixin, View):
             ledger_lines.append(f"Expense: {exp.purpose}, {exp.amount} {active_cycle.currency_symbol}{owe}{note}")
             
         full_ledger_text = "\n".join(ledger_lines)
-        print(request.LANGUAGE_CODE)
         ai_context = {
             'remaining_days': rest_of_days,
             'main_budget': main_budget,
@@ -188,7 +187,7 @@ class AddIncomeView(LoginRequiredMixin,View):
             income.save()
             return redirect('home')
         
-        return render(request,'finance/add_income.html',{'form':form})
+        return render(request,'finance/add_income.html',{'form':form,'cycle_currency':active_cycle.currency_symbol})
 
 
 class AddSpecialView(LoginRequiredMixin,View):
@@ -212,7 +211,7 @@ class AddSpecialView(LoginRequiredMixin,View):
             special.cycle = active_cycle
             special.save()
             return redirect('home')
-        return render(request, 'finance/add_special.html', {'form': form})
+        return render(request,'finance/add_special.html',{'form':form,'cycle_currency':active_cycle.currency_symbol})
 
 
 class EditSpecialView(LoginRequiredMixin,View):
@@ -232,7 +231,7 @@ class EditSpecialView(LoginRequiredMixin,View):
         if form.is_valid():
             form.save()
             return redirect('home')
-        return render(request, 'finance/edit_special.html', {'form': form, 'special': special})
+        return render(request, 'finance/edit_special.html', {'form': form, 'special': special, 'cycle_currency': special.cycle.currency_symbol})
 
 
 class DeleteSpecialView(LoginRequiredMixin,View):
@@ -268,7 +267,7 @@ class AddExpenseView(LoginRequiredMixin,View):
             expense.save()
             return redirect('home')
         
-        return render(request,'finance/add_expense.html',{'form':form})
+        return render(request,'finance/add_expense.html',{'form':form,'cycle_currency':active_cycle.currency_symbol})
 
 
 class EditIncomeView(LoginRequiredMixin,View):
@@ -290,7 +289,7 @@ class EditIncomeView(LoginRequiredMixin,View):
             form.save()
             return redirect('home')
         else:
-            return render(request,'finance/edit_income.html',{'form':form,'income':income})
+            return render(request,'finance/edit_income.html',{'form':form,'income':income,'cycle_currency':income.cycle.currency_symbol})
 
 
 class EditExpenseView(LoginRequiredMixin,View):
@@ -312,7 +311,7 @@ class EditExpenseView(LoginRequiredMixin,View):
             form.save()
             return redirect('home')
         else:
-            return render(request,'finance/edit_expense.html',{'form':form,'expense':expense})
+            return render(request,'finance/edit_expense.html',{'form':form,'expense':expense,'cycle_currency':expense.cycle.currency_symbol})
 
 class DeleteIncomeView(LoginRequiredMixin,View):
     def get(self, request, pk):
@@ -370,12 +369,12 @@ class AddRecurringView(LoginRequiredMixin,View):
 
 class EditRecurringView(LoginRequiredMixin,View):
     def get(self,request,pk):
-        recurring_expense = models.RecurringExpense.objects.filter(user=request.user).get(pk = pk)
+        recurring_expense = get_object_or_404(models.RecurringExpense, user=request.user, pk=pk)
         form = forms.RecurringExpenseForm(instance=recurring_expense)
         return render(request,'finance/edit_recurring.html',{'form':form})
 
     def post(self,request,pk):
-        recurring_expense = models.RecurringExpense.objects.filter(user=request.user).get(pk = pk)
+        recurring_expense = get_object_or_404(models.RecurringExpense, user=request.user, pk=pk)
         form = forms.RecurringExpenseForm(request.POST,instance=recurring_expense)
         if form.is_valid():
             form.save()
@@ -386,11 +385,11 @@ class EditRecurringView(LoginRequiredMixin,View):
 
 class DeleteRecurringView(LoginRequiredMixin,View):
     def get(self,request,pk):
-        recurring_expense = models.RecurringExpense.objects.filter(user=request.user).get(pk = pk)
+        recurring_expense = get_object_or_404(models.RecurringExpense, user=request.user, pk=pk)
         return render(request,'finance/delete_confirm.html',{'obj':recurring_expense,'type':'Recurring Expense'})
 
     def post(self,request,pk):
-        recurring_expense = models.RecurringExpense.objects.filter(user=request.user).get(pk = pk)
+        recurring_expense = get_object_or_404(models.RecurringExpense, user=request.user, pk=pk)
         recurring_expense.delete()
         return redirect('settings')
 

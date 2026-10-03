@@ -17,7 +17,7 @@ def get_financial_advice(context_data):
             f"Your goal is to calculate the hard numbers AND find hidden insights in the comments.\n\n"
             
             f"=== LANGUAGE ===\n"
-            f"IMPORTANT: You must respond in the following language: {context_data.get('language', 'en')}"
+            f"IMPORTANT: You must respond in the following language: {context_data.get('language', 'en')}\n\n"
             
             f"=== DATA ===\n"
             f"Days Left: {context_data['remaining_days']}\n"
