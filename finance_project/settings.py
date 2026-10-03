@@ -125,8 +125,15 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-# Enable Whitenoise storage
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Enable Whitenoise storage (compressed, cache-busted files) in production.
+# STATICFILES_STORAGE was removed in Django 5.1, so this has to go through STORAGES.
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage' if DEBUG
+        else 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # Default primary key field type
 
@@ -146,6 +153,11 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.va8ti.com",
     "https://*.up.railway.app",
 ]
+
+# Railway terminates HTTPS at its proxy and forwards plain HTTP
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 
 
