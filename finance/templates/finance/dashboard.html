@@ -1,413 +1,211 @@
 {% extends 'base.html' %}
-{% load i18n %}
-{% load static %}
+{% load i18n money %}
 
-{% block title %}va8ti{% endblock %}
-
-{% block css_styling %}
-    <link rel="stylesheet" href="{% static 'finance/dashboard.css' %}">
-{% endblock %}
+{% block title %}{% trans "Home" %}{% endblock %}
+{% block app_class %}app--wide{% endblock %}
 
 {% block content %}
-
-<div class="control-center-container">
-    <!-- LEFT: Circular Gauge (Days Remaining) -->
-    <div class="cc-section cc-left">
-        <div class="usage-gauge" style="--gauge-deg: {{ days_progress_degrees }}deg;">
-            <div class="gauge-inner">
-                <span class="gauge-value">{{ remaining_days }}</span>
-                <span class="gauge-label">{% trans "DAYS" %}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- CENTER: Daily Allocation + Status Pill -->
-    <div class="cc-section cc-center">
-        <span class="main-label">{% trans "DAILY ALLOCATION" %}</span>
-        <div class="main-number">{{ main_daily_allowance }}</div>
-    </div>
-
-    <!-- RIGHT: Total Balance -->
-    <div class="cc-section cc-right">
-        <span class="sub-label">{% trans "TOTAL SOLDE" %}</span>
-        <div class="sub-number">{{ main_budget }} <small>{{ cycle_currency }}</small></div>
-    </div>
+<div class="topbar">
+    <a href="{% url 'home' %}" class="logo">va8ti</a>
+    {% if cycle %}
+    <button type="button" class="btn-pill" id="aiAskBtn" data-url="{% url 'get_ai_advice' %}">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
+        <span>{% trans "Ask AI" %}</span>
+    </button>
+    {% endif %}
 </div>
 
-<!-- AI Advice Section (New Location) -->
-<!-- AI Advice Section (On Demand) -->
-<div class="ai-glass-container">
-    <div class="ai-glass-card collapsed" id="aiCard">
-        <div class="ai-card-header">
-            <div class="header-content">
-                <div class="pulsing-indicator" id="aiStatusIndicator"></div>
-                <span class="ai-title"><i class="fas fa-magic mr-2"></i>{% trans "AI Financial Insights" %}</span>
-            </div>
-            
-            <div class="header-actions">
-                <button id="aiAskBtn" class="ai-ask-btn" onclick="fetchAiAdvice(event)">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-                    </svg>
-                    {% trans "Ask AI" %}
-                </button>
+{% if not cycle %}
+<section class="card welcome">
+    <h1>{% trans "Start your first cycle" %}</h1>
+    <p>{% trans "Pick the dates between two paydays, add what comes in and what has to go out, and va8ti tells you how much you can freely spend each day." %}</p>
+    <a href="{% url 'start_cycle' %}" class="btn btn-primary">{% trans "Start a cycle" %}</a>
+</section>
+{% else %}
 
-                <div class="toggle-icon" id="aiToggleIcon" style="display: none;" onclick="toggleAiCard()">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+<section class="ai-card" id="aiCard" hidden aria-live="polite">
+    <div class="card-head">
+        <h2 class="card-title">{% trans "AI Financial Insights" %}</h2>
+        <button type="button" class="btn-pill" id="aiClose">{% trans "Close" %}</button>
+    </div>
+    <div class="ai-text" id="aiText"></div>
+</section>
+
+<div class="columns">
+    <div>
+        <section class="hero" aria-label="{% trans 'Free money' %}">
+            <div class="hero-top">
+                <div>
+                    <div class="hero-label">{% trans "Free to spend per day" %}</div>
+                    <div class="hero-number {% if s.per_day < 0 %}hero-negative{% endif %}">
+                        <strong>{{ s.per_day|money }}</strong><span>{{ cycle.currency_symbol }}</span>
+                    </div>
+                    {% if s.pending_entries %}
+                    <div class="hero-sub">{% blocktrans with amount=s.potential_per_day|money %}{{ amount }} / day if pending comes through{% endblocktrans %}</div>
+                    {% endif %}
+                </div>
+                <div class="ring">
+                    <svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true">
+                        <defs><linearGradient id="dayRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FDE68A"/><stop offset="100%" stop-color="#34D399"/></linearGradient></defs>
+                        <circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="9"/>
+                        <circle cx="52" cy="52" r="44" fill="none" stroke="url(#dayRing)" stroke-width="9" stroke-linecap="round" stroke-dasharray="{{ s.ring_dash|stringformat:'s' }} 277" transform="rotate(-90 52 52)"/>
                     </svg>
+                    <div class="ring-label">
+                        <strong>{{ s.days_left }}</strong>
+                        <span>{% blocktrans count days=s.days_left %}day left{% plural %}days left{% endblocktrans %}</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="ai-card-content">
-            <div class="ai-response-text" id="aiResponseText"></div>
-        </div>
-    </div>
-</div>
 
-<div class="ledger-grid">
-    <div class="ledger-column">
-        <div class="panel-card income-panel">
-            <div class="panel-header">
-                <h3>{% trans "Income" %}</h3>
-                <span class="total">+{{ total_incomes }} {{ cycle_currency }}</span>
+            <div class="pace pace--{{ s.pace }}">
+                <div class="pace-row">
+                    <span>{% trans "Free money left" %}</span>
+                    <strong>{% blocktrans with left=s.free_left|money total=s.free_money|money %}{{ left }} of {{ total }}{% endblocktrans %}</strong>
+                </div>
+                <div class="pace-track" role="img" aria-label="{% blocktrans with left=s.left_percent expected=s.expected_percent %}{{ left }}% of free money left, {{ expected }}% expected today{% endblocktrans %}">
+                    <div class="pace-fill" style="width: {{ s.left_percent }}%"></div>
+                    <div class="pace-marker" style="left: {{ s.expected_percent }}%"></div>
+                </div>
+                <div class="pace-row">
+                    <span>{% trans "Line = where you should be today" %}</span>
+                    <span class="pace-status">
+                        {% if s.pace == 'on_track' %}{% trans "On track" %}{% elif s.pace == 'a_bit_fast' %}{% trans "A bit fast" %}{% else %}{% trans "Too fast" %}{% endif %}
+                    </span>
+                </div>
             </div>
-            
-            <div class="transaction-list">
-                {% for income in incomes %}
-                <div class="list-row {{ income.status }}" onclick="toggleRow(this)">
+
+            <a href="{% url 'checkin' %}" class="btn btn-white">{% trans "Check in my balance" %}</a>
+        </section>
+
+        <nav class="quick" aria-label="{% trans 'Add' %}">
+            <a href="{% url 'add_entry' %}?kind=income" class="q-income">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                {% trans "Income" %}
+            </a>
+            <a href="{% url 'add_entry' %}?kind=expense" class="q-expense">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+                {% trans "Expense" %}
+            </a>
+            <a href="{% url 'add_entry' %}?certainty=probable" class="q-pending">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+                {% trans "Not sure yet" %}
+            </a>
+        </nav>
+
+        <section class="card">
+            <div class="card-head">
+                <h2 class="card-title">{% trans "This cycle's plan" %}</h2>
+                <span class="card-hint">{% trans "Tap any amount to edit" %}</span>
+            </div>
+            <div class="totals">
+                <div><small>{% trans "Income" %}</small><strong class="text-income">{{ s.income|signed_money }}</strong></div>
+                <div><small>{% trans "Expenses" %}</small><strong class="text-expense">−{{ s.expenses|money }}</strong></div>
+                <div><small>{% trans "Free money" %}</small><strong>{{ s.free_money|money }}</strong></div>
+            </div>
+            <div class="rows">
+                {% for e in s.certain_entries %}
+                <div class="row">
+                    <form method="post" action="{% url 'toggle_entry_done' e.pk %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="tick {% if e.is_done %}is-done{% endif %}"
+                                aria-label="{% if e.is_done %}{% trans 'Mark as not done' %}{% elif e.is_income %}{% trans 'Mark as received' %}{% else %}{% trans 'Mark as paid' %}{% endif %}">
+                            <span>{% if e.is_done %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>{% endif %}</span>
+                        </button>
+                    </form>
                     <div class="row-main">
-                        <div class="row-left">
-                            <div class="title">{{ income.source }}</div>
-                            {% if income.comment %}
-                                <div class="comment-preview">{{ income.comment|truncatechars:25 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="row-right">
-                            {% if income.owe_me %}
-                                <span class="debt-badge">🤝</span>
-                            {% endif %}
-                            <span class="amount">+{{ income.amount }}</span>
+                        <div class="row-title">{% if e.goal_id %}{% if e.is_income %}{% trans "From savings" %}{% else %}{% trans "To savings" %}{% endif %} · {% endif %}{{ e.title }}</div>
+                        <div class="row-sub {% if e.is_debt and not e.is_done %}warn{% endif %}">
+                            {% if e.is_debt %}{% if e.is_income %}{% trans "Owed to me" %}{% else %}{% trans "I owe" %}{% endif %} · {% endif %}
+                            {% if e.is_done %}{% if e.goal_id %}{% trans "Transferred" %}{% elif e.is_income %}{% trans "Received" %}{% else %}{% trans "Paid" %}{% endif %}{% else %}{% if e.is_income %}{% trans "Not received yet" %}{% else %}{% trans "Not paid yet" %}{% endif %}{% endif %}
+                            {% if e.previous_amount is not None %} · {% blocktrans with amount=e.previous_amount|money %}changed from {{ amount }}{% endblocktrans %}{% endif %}
                         </div>
                     </div>
-                    
-                    <!-- Hidden Expandable Section -->
-                    <div class="row-expandable">
-                        <div class="full-comment">
-                            {% if income.comment %}
-                                {{ income.comment }}
-                            {% else %}
-                                <span style="font-style: italic; opacity: 0.6;">{% trans "No comment provided." %}</span>
-                            {% endif %}
-                        </div>
-                        <div class="row-actions">
-                            <a href="{% url 'edit_income' income.pk %}" class="action-btn btn-edit" onclick="event.stopPropagation()">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                </svg>
-                                {% trans "Edit" %}
-                            </a>
-                            <a href="{% url 'delete_income' income.pk %}" class="action-btn btn-delete" onclick="event.stopPropagation()">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                                {% trans "Delete" %}
-                            </a>
-                        </div>
-                    </div>
+                    <a href="{% url 'edit_entry' e.pk %}" class="amount-btn {{ e.kind }}" aria-label="{% blocktrans with title=e.title %}Edit {{ title }}{% endblocktrans %}">{{ e.signed_amount|signed_money }}</a>
                 </div>
                 {% empty %}
-                <div class="empty-state">{% trans "No income recorded yet." %}</div>
+                <p class="empty">{% trans "Nothing planned yet. Add your income and the expenses you have to cover." %}</p>
                 {% endfor %}
             </div>
-        </div>
+        </section>
     </div>
 
-    <div class="ledger-column">
-        <div class="panel-card expense-panel">
-            <div class="panel-header">
-                <h3>{% trans "Expenses" %}</h3>
-                <span class="total">-{{ total_expenses }} {{ cycle_currency }}</span>
+    <div>
+        {% if s.pending_entries %}
+        <section class="pending">
+            <div class="pending-head">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+                <h2>{% trans "Not confirmed yet" %}</h2>
             </div>
-
-            <div class="transaction-list">
-                {% for expense in expenses %}
-                <div class="list-row expense-row" onclick="toggleRow(this)">
-                    <div class="row-main">
-                        <div class="row-left">
-                            <div class="title">{{ expense.purpose }}</div>
-                            {% if expense.comment %}
-                                <div class="comment-preview">{{ expense.comment|truncatechars:25 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="row-right">
-                            <span class="amount">-{{ expense.amount }}</span>
-                            {% if expense.i_owe %}
-                                <span class="debt-badge">🤝</span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Hidden Expandable Section -->
-                    <div class="row-expandable">
-                        <div class="full-comment">
-                            {% if expense.comment %}
-                                {{ expense.comment }}
-                            {% else %}
-                                <span style="font-style: italic; opacity: 0.6;">{% trans "No comment provided." %}</span>
-                            {% endif %}
-                        </div>
-                        <div class="row-actions">
-                            <a href="{% url 'edit_expense' expense.pk %}" class="action-btn btn-edit" onclick="event.stopPropagation()">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                </svg>
-                                {% trans "Edit" %}
-                            </a>
-                            <a href="{% url 'delete_expense' expense.pk %}" class="action-btn btn-delete" onclick="event.stopPropagation()">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                                {% trans "Delete" %}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="empty-state">{% trans "No expenses yet." %}</div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- Specials / Uncertain Transactions Section -->
-<div class="specials-container">
-    <div class="panel-card special-panel">
-        <div class="panel-header" style="flex-direction: column; align-items: flex-start;">
-            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                <h3>{% trans "Uncertain / Specials" %}</h3>
-                <div class="header-right">
-                    <span class="total-tag income-tag">+{{ total_special_incomes }}</span>
-                    <span class="total-tag expense-tag">-{{ total_special_expenses }}</span>
-                </div>
-            </div>
-            <!-- Potential Metrics Display -->
-             <div style="margin-top: 10px; font-size: 0.9rem; color: #6b7280; display: flex; gap: 15px;">
-                <span>{% trans "Potential Balance" %}: <strong>{{ potential_budget }}</strong></span>
-                <span>{% trans "Potential Daily" %}: <strong>{{ potential_daily_allowance }}</strong></span>
-             </div>
-        </div>
-        
-        <div class="transaction-list">
-            {% for special in specials %}
-            <div class="list-row special-row {{ special.type }}" onclick="toggleRow(this)">
+            <div class="pending-note">{% trans "Only counted in the “if pending comes through” amount." %}</div>
+            {% for e in s.pending_entries %}
+            <div class="pending-item">
                 <div class="row-main">
-                    <div class="row-left">
-                        <div class="title">{{ special.title }}</div>
-                        <div class="comment-preview">{{ special.type|title }} {% if special.comment %}- {{ special.comment|truncatechars:25 }}{% endif %}</div>
-                    </div>
-                    <div class="row-right">
-                        {% if special.type == 'income' %}
-                            <span class="amount text-success">+{{ special.amount }}</span>
-                        {% else %}
-                             <span class="amount text-danger">-{{ special.amount }}</span>
-                        {% endif %}
+                    <a href="{% url 'edit_entry' e.pk %}"><div class="row-title">{{ e.title }}</div></a>
+                    <div class="pending-meta">
+                        <strong class="{% if e.is_income %}text-income{% else %}text-expense{% endif %}">{{ e.signed_amount|signed_money }}</strong>
+                        <span class="chip">{{ e.get_certainty_display }}</span>
                     </div>
                 </div>
-
-                <!-- Hidden Expandable Section -->
-                <div class="row-expandable">
-                    <div class="full-comment">
-                         {% if special.comment %}
-                            {{ special.comment }}
-                        {% else %}
-                            <span style="font-style: italic; opacity: 0.6;">{% trans "No comment provided." %}</span>
-                        {% endif %}
-                    </div>
-                    <div class="row-actions">
-                        <!-- Convert Button -->
-                        <form method="POST" action="{% url 'convert_special' special.pk %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="action-btn btn-edit" style="border:none; cursor:pointer;" onclick="event.stopPropagation()">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                {% trans "Confirm" %}
-                            </button>
-                        </form>
-
-                        <a href="{% url 'edit_special' special.pk %}" class="action-btn btn-edit" onclick="event.stopPropagation()">
-                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                </svg>
-                            {% trans "Edit" %}
-                        </a>
-                        <a href="{% url 'delete_special' special.pk %}" class="action-btn btn-delete" onclick="event.stopPropagation()">
-                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                            {% trans "Delete" %}
-                        </a>
-                    </div>
-                </div>
+                <form method="post" action="{% url 'confirm_entry' e.pk %}" class="inline">
+                    {% csrf_token %}
+                    {% if e.is_income %}
+                    <button type="submit" class="btn btn-sm btn-income">{% trans "Received" %}</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-sm btn-expense">{% trans "It happened" %}</button>
+                    {% endif %}
+                </form>
             </div>
-            {% empty %}
-            <div class="empty-state">{% trans "No uncertain transactions." %}</div>
             {% endfor %}
-        </div>
+        </section>
+        {% endif %}
+
+        <a href="{% url 'savings' %}" class="link-card">
+            <span class="link-icon">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>
+            </span>
+            <span class="row-main">
+                <span class="row-title" style="font-weight: 800; display: block">{% blocktrans with amount=savings_total|money currency=cycle.currency_symbol %}{{ amount }} {{ currency }} saved{% endblocktrans %}</span>
+                <span class="row-sub">
+                    {% blocktrans count goals=goal_count %}{{ goals }} goal{% plural %}{{ goals }} goals{% endblocktrans %}{% if cycle_saved %} · {% blocktrans with amount=cycle_saved|signed_money %}{{ amount }} this cycle{% endblocktrans %}{% endif %}
+                </span>
+            </span>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#4B5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
     </div>
 </div>
+{% endif %}
+{% endblock %}
 
-
-<!-- TOP RIGHT MENU FAB -->
-<div class="fab-container secondary-fab-left">
-    <div class="fab-options">
-        <a href="{% url 'settings' %}" class="fab-option option-settings" title="Settings">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:24px; height:24px;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-        </a>
-        
-        <div class="fab-option option-logout" title="Logout">
-             <form action="{% url 'logout' %}" method="POST" style="display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
-                {% csrf_token %}
-                <button type="submit" style="background:none; border:none; cursor:pointer; color:white; display:flex;">
-                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:24px; height:24px;">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-                   </svg>
-                </button>
-            </form>
-        </div>
-    </div>
-    
-    <div class="fab-main">
-        <!-- Main Icon: Gear (Settings) -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:32px; height:32px;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-    </div>
-</div>
-
-<!-- BOTTOM RIGHT ADD FAB -->
-<div class="fab-container">
-    <div class="fab-options">
-        <a href="{% url 'add_special' %}" class="fab-option option-special">
-            <span>?</span>
-        </a>
-        <a href="{% url 'add_expense' %}" class="fab-option option-expense">
-            <span>Exp</span>
-        </a>
-        <a href="{% url 'add_income' %}" class="fab-option option-income">
-            <span>Inc</span>
-        </a>
-    </div>
-    
-    <div class="fab-main">
-        <span>+</span>
-    </div>
-</div>
-
+{% block scripts %}
+{% if cycle %}
 <script>
-    function toggleRow(element) {
-        // Toggle the expanded class
-        element.classList.toggle('expanded');
-    }
+(function () {
+    const btn = document.getElementById('aiAskBtn');
+    const card = document.getElementById('aiCard');
+    const text = document.getElementById('aiText');
+    const label = btn.querySelector('span');
+    const original = label.textContent;
 
-    // Handle Multiple FABs independently
-    const fabs = document.querySelectorAll('.fab-container');
-    
-    fabs.forEach(fab => {
-        fab.addEventListener('click', function(e) {
-            // Prevent closing immediately if clicking inside
-            e.stopPropagation(); 
-            // Close other FABs
-            fabs.forEach(other => {
-                if(other !== fab) other.classList.remove('active');
-            });
-            this.classList.toggle('active');
-        });
-    });
+    document.getElementById('aiClose').addEventListener('click', function () { card.hidden = true; });
 
-    // Close FABs when clicking outside
-    document.addEventListener('click', function() {
-        fabs.forEach(fab => fab.classList.remove('active'));
-    });
-
-    /* --- AI TYPEWRITER LOGIC & FETCH --- */
-    let aiTypewriterTimeout;
-    
-    // Toggle function for manual expand/collapse after loading
-    function toggleAiCard() {
-        const card = document.getElementById('aiCard');
-        card.classList.toggle('expanded');
-    }
-
-    async function fetchAiAdvice(event) {
-        event.stopPropagation();
-        
-        const btn = document.getElementById('aiAskBtn');
-        const indicator = document.getElementById('aiStatusIndicator');
-        const textContainer = document.getElementById('aiResponseText');
-        const card = document.getElementById('aiCard');
-        const toggleIcon = document.getElementById('aiToggleIcon');
-
-        // 1. Prepare UI for loading
+    btn.addEventListener('click', async function () {
         btn.disabled = true;
-        // Keep button width consistent or add "..."
-        const originalBtnText = btn.innerHTML;
-        btn.innerHTML = `<span class="spinner"></span> {% trans "Thinking..." %}`;
-        
-        indicator.classList.add('urgent'); // Example class for faster pulse
-        textContainer.innerHTML = '';
-        card.classList.remove('expanded'); // Ensure closed while loading
-        toggleIcon.style.display = 'none';
-
+        label.textContent = "{% trans 'Thinking...' %}";
         try {
-            // 2. Fetch from API
-            const response = await fetch("{% url 'get_ai_advice' %}");
-            if (!response.ok) throw new Error('Network response was not ok');
+            const response = await fetch(btn.dataset.url);
             const data = await response.json();
-
-            if (data.advice) {
-                // 3. Success State
-                // Hide button, show toggle
-                btn.style.display = 'none'; 
-                toggleIcon.style.display = 'block';
-
-                // Open Card
-                card.classList.add('expanded');
-                
-                // Start Typing
-                typeWriter(textContainer, data.advice, 0);
-
-            } else {
-                // API Logic Error
-                btn.innerHTML = "{% trans 'Error. Try Again' %}";
-                btn.disabled = false;
-            }
-
+            text.textContent = data.advice || data.error || "{% trans 'Error. Try Again' %}";
+            card.hidden = false;
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (error) {
-            console.error('AI Fetch Error:', error);
-            btn.innerHTML = "{% trans 'Error. Try Again' %}";
-            btn.disabled = false;
+            text.textContent = "{% trans 'Error. Try Again' %}";
+            card.hidden = false;
         } finally {
-            indicator.classList.remove('urgent');
+            btn.disabled = false;
+            label.textContent = original;
         }
-    }
-
-    function typeWriter(element, text, index) {
-        if (index < text.length) {
-            element.textContent += text.charAt(index);
-            const speed = Math.random() * (50 - 20) + 20;
-            aiTypewriterTimeout = setTimeout(() => {
-                typeWriter(element, text, index + 1);
-            }, speed);
-        }
-    }
+    });
+})();
 </script>
-
+{% endif %}
 {% endblock %}

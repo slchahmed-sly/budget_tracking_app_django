@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Recurring expense" %}{% endblock %}
+
+{% block content %}
+<a href="{% url 'settings' %}" class="back-link">← {% trans "Back" %}</a>
+
+<form method="post" class="sheet" novalidate>
+    {% csrf_token %}
+    <h1>{% if obj %}{{ obj.purpose }}{% else %}{% trans "New recurring expense" %}{% endif %}</h1>
+    <p class="lead">{% trans "A fixed bill (e.g. rent, internet) copied into every new cycle." %}</p>
+
+    <div class="field">
+        <label for="{{ form.purpose.id_for_label }}">{% trans "What is it?" %}</label>
+        {{ form.purpose }}
+        {{ form.purpose.errors }}
+    </div>
+    <div class="field">
+        <label for="{{ form.amount.id_for_label }}">{% trans "Amount" %}</label>
+        <div class="big-amount is-expense">{{ form.amount }}</div>
+        {{ form.amount.errors }}
+    </div>
+    <label class="check-row">
+        <span>{% trans "Active (include in the next cycle)" %}</span>
+        {{ form.is_active }}
+    </label>
+
+    <div class="actions">
+        {% if obj %}
+        <a href="{% url 'delete_recurring' obj.pk %}" class="btn btn-danger">{% trans "Delete" %}</a>
+        {% else %}
+        <a href="{% url 'settings' %}" class="btn btn-outline">{% trans "Cancel" %}</a>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+    </div>
+</form>
+{% endblock %}

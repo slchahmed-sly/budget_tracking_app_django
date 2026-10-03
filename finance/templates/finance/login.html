@@ -1,49 +1,31 @@
 {% extends 'base.html' %}
-{% load static %}
 {% load i18n %}
 
 {% block title %}{% trans "Login" %}{% endblock %}
 
-{% block css_styling %}
-    <link rel="stylesheet" href="{% static 'finance/auth.css' %}">
-{% endblock %}
-
-{% block content %}
-<div class="form-panel auth-blue">
-    <div class="panel-header">
-        <h2>{% trans "Welcome Back" %}</h2>
-        <p>{% trans "Login to manage your cycle" %}</p>
-    </div>
-
-    <form method="POST">
+{% block body %}
+<main class="auth">
+    <div class="logo">va8ti</div>
+    <form method="post" class="sheet" novalidate>
         {% csrf_token %}
+        <h1>{% trans "Welcome Back" %}</h1>
+        <p class="lead">{% trans "Login to manage your cycle" %}</p>
 
-        {% if form.non_field_errors %}
-            <div class="error-box" style="background:#fee2e2; color:#b91c1c; padding:15px; border-radius:8px; margin-bottom:20px;">
-                {% for error in form.non_field_errors %}
-                    <p style="font-weight:bold; margin:0;">{{ error }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
 
-        <div class="form-group">
-            <label class="field-label">{% trans "Username" %}</label>
+        <div class="field">
+            <label for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
             {{ form.username }}
         </div>
-
-        <div class="form-group">
-            <label class="field-label">{% trans "Password" %}</label>
+        <div class="field">
+            <label for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
             {{ form.password }}
         </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn-save btn-auth">{% trans "Login" %}</button>
-            <a href="{% url 'signup' %}" class="btn-cancel">{% trans "Need an account? Sign Up" %}</a>
-        </div>
+        <button type="submit" class="btn btn-primary btn-block">{% trans "Login" %}</button>
+        <a href="{% url 'signup' %}" class="btn btn-outline btn-block">{% trans "Need an account? Sign Up" %}</a>
     </form>
-</div>
-{% endblock %}
-
-{% block footer_content %}
-<p>© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed. A Data Scientist, Software Engineer, Cloud Architect and AI Engineer</p>
+</main>
+<footer class="footer">
+    <p>© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed. A Data Scientist, Software Engineer, Cloud Architect and AI Engineer</p>
+</footer>
 {% endblock %}

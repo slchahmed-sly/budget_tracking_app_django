@@ -21,16 +21,16 @@ def get_financial_advice(context_data):
             
             f"=== DATA ===\n"
             f"Days Left: {context_data['remaining_days']}\n"
-            f"Current Cash: {context_data['main_budget']} {context_data['currency']}\n"
+            f"Free Money Left (after all certain commitments like rent, bills, debts and savings): {context_data['main_budget']} {context_data['currency']}\n"
             f"Daily Allowance: {context_data['daily_allowance']} {context_data['currency']}\n"
-            f"Risk Info: {context_data['uncertain_total']} is uncertain income. {context_data['debt_total']} is owed to user.\n"
+            f"Risk Info: probable/uncertain items not yet confirmed add up to {context_data['uncertain_total']} (net, income minus expenses). {context_data['debt_total']} is owed to user.\n"
             f"FULL LEDGER:\n{context_data['full_ledger']}\n\n"
             
             f"=== INSTRUCTIONS ===\n"
             f"Output exactly 3 distinct sections. Do not use Markdown (**bold**) but use clear headers.\n\n"
             
             f"SECTION 1: THE STRATEGY\n"
-            f"- Calculate the 'Real Safe Spend' (Cash - Uncertain - Debts) / Days.\n"
+            f"- Explain what the daily allowance means and what changes if the uncertain items do or don't happen.\n"
             f"- Calculate the 'Skip Day Bonus' (Allowance * 2).\n"
             f"- If there are debts to collect, calculate how much they would increase the daily allowance.\n\n"
             

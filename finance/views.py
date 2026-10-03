@@ -1,417 +1,448 @@
-from . import ai_utils
-from django.shortcuts import render,redirect,get_object_or_404
-from django.views import View
-from . import models
-from datetime import date, timedelta
-from . import forms
-# User Registration
+from datetime import timedelta
+
 from django.contrib.auth.forms import UserCreationForm
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Sum
+from django.http import Http404, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.utils import timezone
+from django.views import View
+from django.views.generic import CreateView
+
+from . import ai_utils, budget, forms, models
+
 
 # Helper function to get active cycle
 def get_active_cycle(user):
-    return models.Cycle.objects.filter(user=user).order_by('-start').first()
-
-from django.http import JsonResponse
-class GetAIAdviceView(LoginRequiredMixin, View):
-    def get(self, request):
-        active_cycle = get_active_cycle(request.user)
-        if not active_cycle:
-            return JsonResponse({'error': 'No active cycle found.'}, status=400)
-        
-        # Gather data for AI
-        incomes = models.Income.objects.filter(cycle=active_cycle).order_by('-amount')
-        expenses = models.Expense.objects.filter(cycle=active_cycle).order_by('-amount')
-        
-        # Calculate totals
-        total_incomes = sum(i.amount for i in incomes if i.amount)
-        total_expenses = sum(i.amount for i in expenses if i.amount)
-        
-        cycle_end_date = active_cycle.start + timedelta(days=30)
-        today = date.today()
-        rest_of_days = (cycle_end_date - today).days
-        if rest_of_days < 1: rest_of_days = 1
-        
-        main_budget = total_incomes - total_expenses
-        daily_allowance = round(main_budget / rest_of_days)
-        
-        uncertain_total = sum(i.amount for i in incomes if i.amount and i.status != 'certain')
-        debt_total = sum(i.amount for i in incomes if i.amount and i.owe_me)
-        
-        # Build Ledger
-        ledger_lines = []
-        for inc in incomes:
-            status = f"({inc.status})"
-            owe = " [OWE ME]" if inc.owe_me else ""
-            note = f" [Note: {inc.comment}]" if inc.comment else ""
-            ledger_lines.append(f"Income: {inc.source}, {inc.amount} {active_cycle.currency_symbol} {status}{owe}{note}")
-            
-        for exp in expenses:
-            owe = " [I OWE]" if exp.i_owe else ""
-            note = f" [Note: {exp.comment}]" if exp.comment else ""
-            ledger_lines.append(f"Expense: {exp.purpose}, {exp.amount} {active_cycle.currency_symbol}{owe}{note}")
-            
-        full_ledger_text = "\n".join(ledger_lines)
-        ai_context = {
-            'remaining_days': rest_of_days,
-            'main_budget': main_budget,
-            'daily_allowance': daily_allowance,
-            'currency': active_cycle.currency_symbol,
-            'uncertain_total': uncertain_total,
-            'debt_total': debt_total,
-            'full_ledger': full_ledger_text,
-            'language': request.LANGUAGE_CODE,
-        }
-        
-        try:
-            advice = ai_utils.get_financial_advice(ai_context)
-            return JsonResponse({'advice': advice})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+    return models.Cycle.objects.filter(user=user).first()
 
 
+def savings_total(user):
+    return models.SavingsTransaction.objects.filter(goal__user=user).aggregate(total=Sum('amount'))['total'] or 0
 
 
 class DashBoardView(LoginRequiredMixin, View):
     def get(self, request):
-        current_cycle = get_active_cycle(request.user)
-        if not current_cycle:
-            return render(request, 'finance/dashboard.html', {'error': 'No active cycle found.'})
-        
-        cycle_end_date = current_cycle.start + timedelta(days=30)
-        today = date.today()
-        rest_of_days = (cycle_end_date - today).days
+        cycle = get_active_cycle(request.user)
+        if not cycle:
+            return render(request, 'finance/dashboard.html', {'cycle': None})
 
-        if rest_of_days < 1:
-            rest_of_days = 1
-
-        # Fetch Data
-        incomes = models.Income.objects.filter(cycle=current_cycle).order_by('-amount')
-        expenses = models.Expense.objects.filter(cycle=current_cycle).order_by('-amount')
-        specials = models.Special.objects.filter(cycle=current_cycle).order_by('-amount') 
-
-        total_incomes = sum(i.amount for i in incomes if i.amount)
-        total_expenses = sum(i.amount for i in expenses if i.amount)
-
-        # Main Budget
-        main_budget = total_incomes - total_expenses
-        main_daily_allowance = round(main_budget / rest_of_days)
-
-        # Specials Calculation
-        special_incomes = [s for s in specials if s.type == 'income']
-        special_expenses = [s for s in specials if s.type == 'expense']
-
-        total_special_incomes = sum(s.amount for s in special_incomes if s.amount)
-        total_special_expenses = sum(s.amount for s in special_expenses if s.amount)
-
-        # Potential Budget
-        potential_total_incomes = total_incomes + total_special_incomes
-        potential_total_expenses = total_expenses + total_special_expenses
-        
-        potential_budget = potential_total_incomes - potential_total_expenses
-        potential_daily_allowance = round(potential_budget / rest_of_days)
-
-
-
+        summary = budget.summarize(cycle)
+        cycle_saved = models.SavingsTransaction.objects.filter(
+            goal__user=request.user, entry__cycle=cycle
+        ).aggregate(total=Sum('amount'))['total'] or 0
         return render(request, 'finance/dashboard.html', {
-            'main_budget': main_budget,
-            'main_daily_allowance': main_daily_allowance,
-            
-            'potential_budget': potential_budget,
-            'potential_daily_allowance': potential_daily_allowance,
-
-            'remaining_days': rest_of_days,
-            'cycle_currency': current_cycle.currency_symbol,
-            'incomes': incomes,
-            'expenses': expenses,
-            'specials': specials,
-            
-
-
-            'total_incomes': total_incomes,
-            'total_expenses': total_expenses,
-            'total_special_incomes': total_special_incomes,
-            'total_special_expenses': total_special_expenses,
+            'cycle': cycle,
+            's': summary,
+            'savings_total': savings_total(request.user),
+            'goal_count': request.user.savings_goals.count(),
+            'cycle_saved': cycle_saved,
         })
 
-class ConvertSpecialView(LoginRequiredMixin,View):
-    def post(self, request, pk):
-        special = get_object_or_404(models.Special,cycle__user=request.user, pk=pk)
-        current_cycle = special.cycle
 
-        if special.type == 'income':
-            # Create new Income, assuming 'certain' status as per user request
-            models.Income.objects.create(
-                source=special.title,
-                amount=special.amount,
-                cycle=current_cycle,
-                comment=special.comment,
-                owe_me=special.owe_me,
-                status='certain' 
-            )
-        elif special.type == 'expense':
-            # Create new Expense
-            models.Expense.objects.create(
-                purpose=special.title,
-                amount=special.amount,
-                cycle=current_cycle,
-                comment=special.comment,
-                i_owe=special.i_owe
-            )
-        
-        special.delete()
-        return redirect('home')
+# --- Entries (income and expenses) ---
 
-
-class AddIncomeView(LoginRequiredMixin,View):
-    def get(self,request):
-        form = forms.IncomeForm()
-        active_cycle = get_active_cycle(request.user)
-        if not active_cycle:
-             return render(request, 'finance/no_cycle.html')
-
-        cycle_currency = active_cycle.currency_symbol
-        return render(request,'finance/add_income.html',{'form':form,'cycle_currency':cycle_currency})
-    
-    def post(self,request):
-        active_cycle = get_active_cycle(request.user)
-        if not active_cycle:
-             return render(request, 'finance/no_cycle.html')
-
-        form = forms.IncomeForm(request.POST)
-        if form.is_valid():
-            income = form.save(commit=False)
-            income.cycle = active_cycle
-            income.save()
-            return redirect('home')
-        
-        return render(request,'finance/add_income.html',{'form':form,'cycle_currency':active_cycle.currency_symbol})
-
-
-class AddSpecialView(LoginRequiredMixin,View):
+class AddEntryView(LoginRequiredMixin, View):
     def get(self, request):
-        form = forms.SpecialForm()
-        active_cycle = get_active_cycle(request.user)
-        if not active_cycle:
-             return render(request, 'finance/no_cycle.html')
-        
-        cycle_currency = active_cycle.currency_symbol
-        return render(request, 'finance/add_special.html', {'form': form, 'cycle_currency': cycle_currency})
+        cycle = get_active_cycle(request.user)
+        if not cycle:
+            return redirect('start_cycle')
+        initial = {
+            'kind': request.GET.get('kind', models.Entry.EXPENSE),
+            'certainty': request.GET.get('certainty', models.Entry.CERTAIN),
+        }
+        form = forms.EntryForm(initial=initial)
+        return render(request, 'finance/entry_form.html', {'form': form, 'cycle': cycle})
 
     def post(self, request):
-        active_cycle = get_active_cycle(request.user)
-        if not active_cycle:
-             return render(request, 'finance/no_cycle.html')
-
-        form = forms.SpecialForm(request.POST)
+        cycle = get_active_cycle(request.user)
+        if not cycle:
+            return redirect('start_cycle')
+        form = forms.EntryForm(request.POST)
         if form.is_valid():
-            special = form.save(commit=False)
-            special.cycle = active_cycle
-            special.save()
+            entry = form.save(commit=False)
+            entry.cycle = cycle
+            entry.is_done = False
+            entry.set_done(form.cleaned_data['is_done'])
+            entry.save()
             return redirect('home')
-        return render(request,'finance/add_special.html',{'form':form,'cycle_currency':active_cycle.currency_symbol})
+        return render(request, 'finance/entry_form.html', {'form': form, 'cycle': cycle})
 
 
-class EditSpecialView(LoginRequiredMixin,View):
+class EditEntryView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        special = get_object_or_404(models.Special,cycle__user=request.user, pk=pk)
-        form = forms.SpecialForm(instance=special)
-        active_cycle = get_active_cycle(request.user)
-        if active_cycle:
-            cycle_currency = active_cycle.currency_symbol
-        else:
-            cycle_currency = 'no currency'
-        return render(request, 'finance/edit_special.html', {'form': form, 'special': special, 'cycle_currency': cycle_currency})
+        entry = get_object_or_404(models.Entry, cycle__user=request.user, pk=pk)
+        form = forms.EntryForm(instance=entry)
+        return render(request, 'finance/entry_form.html', self.context(entry, form))
 
     def post(self, request, pk):
-        special = get_object_or_404(models.Special,cycle__user=request.user, pk=pk)
-        form = forms.SpecialForm(request.POST, instance=special)
+        entry = get_object_or_404(models.Entry, cycle__user=request.user, pk=pk)
+        old_amount, was_done = entry.amount, entry.is_done
+        form = forms.EntryForm(request.POST, instance=entry)
         if form.is_valid():
-            form.save()
+            entry = form.save(commit=False)
+            if entry.amount != old_amount:
+                entry.previous_amount = old_amount
+            entry.is_done = was_done
+            entry.set_done(form.cleaned_data['is_done'])
+            entry.save()
+            entry.sync_savings()
             return redirect('home')
-        return render(request, 'finance/edit_special.html', {'form': form, 'special': special, 'cycle_currency': special.cycle.currency_symbol})
+        return render(request, 'finance/entry_form.html', self.context(entry, form))
+
+    def context(self, entry, form):
+        s = budget.summarize(entry.cycle)
+        # Data for the live "what does this change do to my day" preview
+        return {
+            'form': form,
+            'entry': entry,
+            'cycle': entry.cycle,
+            'impact': {
+                'perDay': s.per_day,
+                'freeLeft': s.free_left,
+                'freeMoney': s.free_money,
+                'daysLeft': s.days_left,
+                'totalDays': s.total_days,
+                'hasCheckin': s.checkin is not None,
+                'inBalance': bool(s.checkin and budget.is_reflected(entry, s.checkin)),
+                'kind': entry.kind,
+                'certainty': entry.certainty,
+                'amount': entry.amount,
+            },
+        }
 
 
-class DeleteSpecialView(LoginRequiredMixin,View):
+class DeleteEntryView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        special = get_object_or_404(models.Special,cycle__user=request.user, pk=pk)
-        return render(request, 'finance/delete_confirm.html', {'obj': special, 'type': 'Special Transaction'})
+        entry = get_object_or_404(models.Entry, cycle__user=request.user, pk=pk)
+        return render(request, 'finance/confirm_delete.html', {'obj': entry, 'cancel_url': 'home'})
 
     def post(self, request, pk):
-        special = get_object_or_404(models.Special,cycle__user=request.user, pk=pk)
-        special.delete()
+        entry = get_object_or_404(models.Entry, cycle__user=request.user, pk=pk)
+        entry.delete()
         return redirect('home')
 
 
-class AddExpenseView(LoginRequiredMixin,View):
-    def get(self,request):
-        form = forms.ExpenseForm()
-        active_cycle = get_active_cycle(request.user)
-        if not active_cycle:
-             return render(request, 'finance/no_cycle.html')
-        
-        cycle_currency = active_cycle.currency_symbol
-        return render(request,'finance/add_expense.html',{'form':form,'cycle_currency':cycle_currency})
-    
-    def post(self,request):
-        active_cycle = get_active_cycle(request.user)
-        if not active_cycle:
-             return render(request, 'finance/no_cycle.html')
-
-        form = forms.ExpenseForm(request.POST)
-        if form.is_valid():
-            expense = form.save(commit=False)
-            expense.cycle = active_cycle
-            expense.save()
-            return redirect('home')
-        
-        return render(request,'finance/add_expense.html',{'form':form,'cycle_currency':active_cycle.currency_symbol})
-
-
-class EditIncomeView(LoginRequiredMixin,View):
-    
-    def get(self,request,pk):
-        income = get_object_or_404(models.Income,cycle__user=request.user,pk=pk)
-        form = forms.IncomeForm(instance=income)
-        active_cycle = get_active_cycle(request.user)
-        if active_cycle:
-            cycle_currency = active_cycle.currency_symbol
-        else:
-            cycle_currency = 'no currency'
-        return render(request,'finance/edit_income.html',{'form':form,'income':income,'cycle_currency':cycle_currency})
-    
-    def post(self,request,pk):
-        income =  get_object_or_404(models.Income,cycle__user=request.user,pk=pk)
-        form = forms.IncomeForm(request.POST,instance=income)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-        else:
-            return render(request,'finance/edit_income.html',{'form':form,'income':income,'cycle_currency':income.cycle.currency_symbol})
-
-
-class EditExpenseView(LoginRequiredMixin,View):
-    
-    def get(self,request,pk):
-        expense = get_object_or_404(models.Expense,cycle__user=request.user,pk=pk)
-        form = forms.ExpenseForm(instance=expense)
-        active_cycle = get_active_cycle(request.user)
-        if active_cycle:
-            cycle_currency = active_cycle.currency_symbol
-        else:
-            cycle_currency = 'no currency'
-        return render(request,'finance/edit_expense.html',{'form':form,'expense':expense,'cycle_currency':cycle_currency})
-    
-    def post(self,request,pk):
-        expense =  get_object_or_404(models.Expense,cycle__user=request.user,pk=pk)
-        form = forms.ExpenseForm(request.POST,instance=expense)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-        else:
-            return render(request,'finance/edit_expense.html',{'form':form,'expense':expense,'cycle_currency':expense.cycle.currency_symbol})
-
-class DeleteIncomeView(LoginRequiredMixin,View):
-    def get(self, request, pk):
-        income = get_object_or_404(models.Income,cycle__user=request.user, pk=pk)
-
-        return render(request, 'finance/delete_confirm.html', {'obj': income, 'type': 'Income'})
-    
+class ToggleEntryDoneView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        income = get_object_or_404(models.Income,cycle__user=request.user, pk=pk)
-        income.delete()
-        return redirect('home')
-
-class DeleteExpenseView(LoginRequiredMixin,View):
-    def get(self, request, pk):
-        expense = get_object_or_404(models.Expense,cycle__user=request.user, pk=pk)
-        return render(request, 'finance/delete_confirm.html', {'obj': expense, 'type': 'Expense'})
-    
-    def post(self, request, pk):
-        expense = get_object_or_404(models.Expense,cycle__user=request.user, pk=pk)
-        expense.delete()
+        entry = get_object_or_404(models.Entry, cycle__user=request.user, pk=pk)
+        entry.set_done(not entry.is_done)
+        entry.save()
+        entry.sync_savings()
         return redirect('home')
 
 
+class ConfirmEntryView(LoginRequiredMixin, View):
+    """A probable/uncertain entry turned out to be real."""
+    def post(self, request, pk):
+        entry = get_object_or_404(models.Entry, cycle__user=request.user, pk=pk)
+        entry.certainty = models.Entry.CERTAIN
+        entry.set_done(True)
+        entry.save()
+        entry.sync_savings()
+        return redirect('home')
 
 
+# --- Balance check-in ---
 
-# settings section related views
-
-class SettingsView(LoginRequiredMixin,View):
+class CheckInView(LoginRequiredMixin, View):
     def get(self, request):
-        cycle_form = forms.CycleForm()
-        active_cycle = get_active_cycle(request.user)
-        if active_cycle:
-            cycle_currency = active_cycle.currency_symbol
-        else:
-            cycle_currency = 'no currency'
-        recurring_expenses = models.RecurringExpense.objects.filter(user=request.user).order_by('-amount')
-        return render(request,'finance/settings.html',{'recurring_expenses':recurring_expenses,'form':cycle_form,'cycle_currency':cycle_currency})
+        cycle = get_active_cycle(request.user)
+        if not cycle:
+            return redirect('start_cycle')
+        return render(request, 'finance/checkin.html', self.context(cycle, forms.CheckInForm()))
+
+    def post(self, request):
+        cycle = get_active_cycle(request.user)
+        if not cycle:
+            return redirect('start_cycle')
+        form = forms.CheckInForm(request.POST)
+        if form.is_valid():
+            checkin = form.save(commit=False)
+            checkin.cycle = cycle
+            checkin.save()
+            return redirect('home')
+        return render(request, 'finance/checkin.html', self.context(cycle, form))
+
+    def context(self, cycle, form):
+        summary = budget.summarize(cycle)
+        unsettled = [e for e in summary.certain_entries if not e.is_done]
+        return {
+            'form': form,
+            'cycle': cycle,
+            's': summary,
+            'unsettled': unsettled,
+            'unsettled_total': budget.unsettled_total(unsettled),
+        }
 
 
-class AddRecurringView(LoginRequiredMixin,View):
-    def get(self,request):
-        form = forms.RecurringExpenseForm()
-        return render(request,'finance/add_recurring.html',{'form':form})
+# --- Cycles ---
 
-    def post(self,request):
+class StartCycleView(LoginRequiredMixin, View):
+    def get(self, request):
+        today = timezone.localdate()
+        previous = get_active_cycle(request.user)
+        form = forms.CycleForm(initial={
+            'start': today,
+            'end': today + timedelta(days=29),
+            'currency_symbol': previous.currency_symbol if previous else 'TL',
+        })
+        return render(request, 'finance/cycle_form.html', self.context(request, form))
+
+    def post(self, request):
+        form = forms.CycleForm(request.POST)
+        if not form.is_valid():
+            return render(request, 'finance/cycle_form.html', self.context(request, form))
+
+        cycle = form.save(commit=False)
+        cycle.user = request.user
+        cycle.save()
+        for recurring in request.user.recurring_expenses.filter(is_active=True):
+            models.Entry.objects.create(
+                cycle=cycle, kind=models.Entry.EXPENSE, title=recurring.purpose, amount=recurring.amount or 0,
+            )
+        for goal in request.user.savings_goals.all():
+            try:
+                amount = int(request.POST.get(f'goal_{goal.pk}') or 0)
+            except ValueError:
+                amount = 0
+            if amount > 0:
+                models.Entry.objects.create(
+                    cycle=cycle, kind=models.Entry.EXPENSE, title=goal.name, amount=amount, goal=goal,
+                )
+        return redirect('home')
+
+    def context(self, request, form):
+        return {
+            'form': form,
+            'is_new': True,
+            'recurring': request.user.recurring_expenses.filter(is_active=True),
+            'goals': request.user.savings_goals.all(),
+        }
+
+
+class EditCycleView(LoginRequiredMixin, View):
+    def get(self, request):
+        cycle = get_active_cycle(request.user)
+        if not cycle:
+            return redirect('start_cycle')
+        return render(request, 'finance/cycle_form.html', {'form': forms.CycleForm(instance=cycle), 'is_new': False})
+
+    def post(self, request):
+        cycle = get_active_cycle(request.user)
+        if not cycle:
+            return redirect('start_cycle')
+        form = forms.CycleForm(request.POST, instance=cycle)
+        if form.is_valid():
+            form.save()
+            return redirect('settings')
+        return render(request, 'finance/cycle_form.html', {'form': form, 'is_new': False})
+
+
+# --- Settings and recurring expenses ---
+
+class SettingsView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'finance/settings.html', {
+            'cycle': get_active_cycle(request.user),
+            'recurring_expenses': request.user.recurring_expenses.order_by('-amount'),
+        })
+
+
+class AddRecurringView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'finance/recurring_form.html', {'form': forms.RecurringExpenseForm()})
+
+    def post(self, request):
         form = forms.RecurringExpenseForm(request.POST)
         if form.is_valid():
             recurring = form.save(commit=False)
             recurring.user = request.user
             recurring.save()
             return redirect('settings')
-        return render(request,'finance/add_recurring.html',{'form':form})
+        return render(request, 'finance/recurring_form.html', {'form': form})
 
 
-class EditRecurringView(LoginRequiredMixin,View):
-    def get(self,request,pk):
+class EditRecurringView(LoginRequiredMixin, View):
+    def get(self, request, pk):
         recurring_expense = get_object_or_404(models.RecurringExpense, user=request.user, pk=pk)
         form = forms.RecurringExpenseForm(instance=recurring_expense)
-        return render(request,'finance/edit_recurring.html',{'form':form})
+        return render(request, 'finance/recurring_form.html', {'form': form, 'obj': recurring_expense})
 
-    def post(self,request,pk):
+    def post(self, request, pk):
         recurring_expense = get_object_or_404(models.RecurringExpense, user=request.user, pk=pk)
-        form = forms.RecurringExpenseForm(request.POST,instance=recurring_expense)
+        form = forms.RecurringExpenseForm(request.POST, instance=recurring_expense)
         if form.is_valid():
             form.save()
             return redirect('settings')
-        return render(request,'finance/edit_recurring.html',{'form':form})
+        return render(request, 'finance/recurring_form.html', {'form': form, 'obj': recurring_expense})
 
 
-
-class DeleteRecurringView(LoginRequiredMixin,View):
-    def get(self,request,pk):
+class DeleteRecurringView(LoginRequiredMixin, View):
+    def get(self, request, pk):
         recurring_expense = get_object_or_404(models.RecurringExpense, user=request.user, pk=pk)
-        return render(request,'finance/delete_confirm.html',{'obj':recurring_expense,'type':'Recurring Expense'})
+        return render(request, 'finance/confirm_delete.html', {'obj': recurring_expense, 'cancel_url': 'settings'})
 
-    def post(self,request,pk):
+    def post(self, request, pk):
         recurring_expense = get_object_or_404(models.RecurringExpense, user=request.user, pk=pk)
         recurring_expense.delete()
         return redirect('settings')
 
 
+# --- Savings ---
 
-class StartCycleView(LoginRequiredMixin,View):
-    
-    def post(self,request):
-        form = forms.CycleForm(request.POST)
+class SavingsView(LoginRequiredMixin, View):
+    def get(self, request):
+        goals = list(request.user.savings_goals.all())
+        transactions = list(
+            models.SavingsTransaction.objects.filter(goal__user=request.user).select_related('goal')
+        )
 
+        # Running total at the end of each month, oldest first
+        monthly = {}
+        for t in transactions:
+            key = t.date.strftime('%Y-%m')
+            monthly[key] = monthly.get(key, 0) + t.amount
+        history, running = [], 0
+        for key in sorted(monthly):
+            running += monthly[key]
+            history.append({'month': key, 'total': running})
+
+        # When each goal is reached at its planned amount per cycle
+        this_month = timezone.localdate().replace(day=1)
+        for g in goals:
+            g.months_left = None
+            g.eta = None
+            if g.saved >= g.target:
+                g.months_left = 0
+            elif g.monthly_amount:
+                g.months_left = -(-(g.target - g.saved) // g.monthly_amount)
+                month_index = this_month.month - 1 + g.months_left
+                g.eta = this_month.replace(year=this_month.year + month_index // 12, month=month_index % 12 + 1)
+
+        cycle = get_active_cycle(request.user)
+        chart = {
+            'history': history,
+            'total': running,
+            'goals': [{'name': g.name, 'months': g.months_left} for g in goals],
+            'per_month': sum(g.monthly_amount for g in goals),
+        }
+        return render(request, 'finance/savings.html', {
+            'goals': goals,
+            'total': running,
+            'transactions': transactions[:20],
+            'chart': chart,
+            'currency': cycle.currency_symbol if cycle else '',
+        })
+
+
+class AddGoalView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'finance/goal_form.html', {'form': forms.SavingsGoalForm()})
+
+    def post(self, request):
+        form = forms.SavingsGoalForm(request.POST)
         if form.is_valid():
-            active_cycle = form.save(commit=False)
-            active_cycle.user = request.user
-            active_cycle.save()
-            recurring_expenses = models.RecurringExpense.objects.filter(user=request.user,is_active=True)
-            for recurring in recurring_expenses:
-                expense = models.Expense(purpose=recurring.purpose,amount=recurring.amount,cycle=active_cycle)
-                expense.save()
-            return redirect('home')
-        return redirect('settings')
-            
-        
+            goal = form.save(commit=False)
+            goal.user = request.user
+            goal.save()
+            return redirect('savings')
+        return render(request, 'finance/goal_form.html', {'form': form})
+
+
+class EditGoalView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        goal = get_object_or_404(models.SavingsGoal, user=request.user, pk=pk)
+        return render(request, 'finance/goal_form.html', {'form': forms.SavingsGoalForm(instance=goal), 'obj': goal})
+
+    def post(self, request, pk):
+        goal = get_object_or_404(models.SavingsGoal, user=request.user, pk=pk)
+        form = forms.SavingsGoalForm(request.POST, instance=goal)
+        if form.is_valid():
+            form.save()
+            return redirect('savings')
+        return render(request, 'finance/goal_form.html', {'form': form, 'obj': goal})
+
+
+class DeleteGoalView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        goal = get_object_or_404(models.SavingsGoal, user=request.user, pk=pk)
+        return render(request, 'finance/confirm_delete.html', {'obj': goal, 'cancel_url': 'savings'})
+
+    def post(self, request, pk):
+        goal = get_object_or_404(models.SavingsGoal, user=request.user, pk=pk)
+        goal.delete()
+        return redirect('savings')
+
+
+class GoalTransferView(LoginRequiredMixin, View):
+    """Move money between the balance and a goal.
+
+    'in'  = balance -> goal: an expense in the current cycle.
+    'out' = goal -> balance: an income in the current cycle.
+    """
+    def dispatch(self, request, *args, **kwargs):
+        if kwargs.get('direction') not in ('in', 'out'):
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, pk, direction):
+        goal = get_object_or_404(models.SavingsGoal, user=request.user, pk=pk)
+        return render(request, 'finance/goal_transfer.html', {
+            'form': forms.TransferForm(), 'goal': goal, 'direction': direction,
+        })
+
+    def post(self, request, pk, direction):
+        goal = get_object_or_404(models.SavingsGoal, user=request.user, pk=pk)
+        form = forms.TransferForm(request.POST)
+        if not form.is_valid():
+            return render(request, 'finance/goal_transfer.html', {'form': form, 'goal': goal, 'direction': direction})
+
+        amount = form.cleaned_data['amount']
+        cycle = get_active_cycle(request.user)
+        if cycle:
+            entry = models.Entry(
+                cycle=cycle,
+                kind=models.Entry.EXPENSE if direction == 'in' else models.Entry.INCOME,
+                title=goal.name,
+                amount=amount,
+                goal=goal,
+            )
+            entry.set_done(True)
+            entry.save()
+            entry.sync_savings()
+        else:
+            models.SavingsTransaction.objects.create(goal=goal, amount=amount if direction == 'in' else -amount)
+        return redirect('savings')
+
+
+# --- AI API ---
+
+class GetAIAdviceView(LoginRequiredMixin, View):
+    def get(self, request):
+        cycle = get_active_cycle(request.user)
+        if not cycle:
+            return JsonResponse({'error': 'No active cycle found.'}, status=400)
+
+        s = budget.summarize(cycle)
+        entries = list(cycle.entries.select_related('goal'))
+        ai_context = {
+            'remaining_days': s.days_left,
+            'main_budget': s.free_left,
+            'daily_allowance': s.per_day,
+            'currency': cycle.currency_symbol,
+            'uncertain_total': s.pending_net,
+            'debt_total': sum(e.amount for e in entries if e.is_income and e.is_debt),
+            'full_ledger': budget.ledger_text(entries, cycle.currency_symbol),
+            'language': request.LANGUAGE_CODE,
+        }
+
+        try:
+            advice = ai_utils.get_financial_advice(ai_context)
+            return JsonResponse({'advice': advice})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
 
 # User Registration

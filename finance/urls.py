@@ -1,27 +1,30 @@
-from django.urls import path 
+from django.urls import path
 from . import views
 from django.contrib.auth.views import LoginView, LogoutView
+
 urlpatterns = [
     path("", views.DashBoardView.as_view(), name="home"),
-    # Income and Expense Routes
-    path("add/income/",views.AddIncomeView.as_view(),name='add_income'),
-    path("add/expense/",views.AddExpenseView.as_view(),name='add_expense'),
-    path("edit/income/<int:pk>",views.EditIncomeView.as_view(),name='edit_income'),
-    path("edit/expense/<int:pk>",views.EditExpenseView.as_view(),name='edit_expense'),
-    path("delete/income/<int:pk>",views.DeleteIncomeView.as_view(),name='delete_income'),
-    path("delete/expense/<int:pk>",views.DeleteExpenseView.as_view(),name='delete_expense'),
-    # Settings Routes
-    path("settings/",views.SettingsView.as_view(),name='settings'),
+    # Entries (income and expenses)
+    path("add/", views.AddEntryView.as_view(), name='add_entry'),
+    path("entry/<int:pk>/edit/", views.EditEntryView.as_view(), name='edit_entry'),
+    path("entry/<int:pk>/delete/", views.DeleteEntryView.as_view(), name='delete_entry'),
+    path("entry/<int:pk>/toggle-done/", views.ToggleEntryDoneView.as_view(), name='toggle_entry_done'),
+    path("entry/<int:pk>/confirm/", views.ConfirmEntryView.as_view(), name='confirm_entry'),
+    path("check-in/", views.CheckInView.as_view(), name='checkin'),
+    # Cycles and settings
+    path("settings/", views.SettingsView.as_view(), name='settings'),
     path("start-cycle/", views.StartCycleView.as_view(), name='start_cycle'),
+    path("edit-cycle/", views.EditCycleView.as_view(), name='edit_cycle'),
     # Recurring Expense Routes
-    path("add/recurring/expense/",views.AddRecurringView.as_view(),name='add_recurring'),
-    path("edit/recurring/expense/<int:pk>",views.EditRecurringView.as_view(),name='edit_recurring'),
-    path("delete/recurring/expense/<int:pk>",views.DeleteRecurringView.as_view(),name='delete_recurring'),
-    # Special Routes
-    path("add/special/",views.AddSpecialView.as_view(),name='add_special'),
-    path("edit/special/<int:pk>",views.EditSpecialView.as_view(),name='edit_special'),
-    path("delete/special/<int:pk>",views.DeleteSpecialView.as_view(),name='delete_special'),
-    path("convert/special/<int:pk>",views.ConvertSpecialView.as_view(),name='convert_special'),
+    path("add/recurring/expense/", views.AddRecurringView.as_view(), name='add_recurring'),
+    path("edit/recurring/expense/<int:pk>", views.EditRecurringView.as_view(), name='edit_recurring'),
+    path("delete/recurring/expense/<int:pk>", views.DeleteRecurringView.as_view(), name='delete_recurring'),
+    # Savings
+    path("savings/", views.SavingsView.as_view(), name='savings'),
+    path("savings/goal/add/", views.AddGoalView.as_view(), name='add_goal'),
+    path("savings/goal/<int:pk>/edit/", views.EditGoalView.as_view(), name='edit_goal'),
+    path("savings/goal/<int:pk>/delete/", views.DeleteGoalView.as_view(), name='delete_goal'),
+    path("savings/goal/<int:pk>/<str:direction>/", views.GoalTransferView.as_view(), name='goal_transfer'),
     # --- AI API ---
     path("api/get-ai-advice/", views.GetAIAdviceView.as_view(), name='get_ai_advice'),
     # --- Auth Routes ---

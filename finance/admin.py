@@ -1,10 +1,9 @@
 from django.contrib import admin
-from .models import Cycle,RecurringExpense, Expense, Income, Special
-
-# Register your models here.
+from .models import Cycle, RecurringExpense, Entry, CheckIn, SavingsGoal, SavingsTransaction
 
 admin.site.register(Cycle)
 admin.site.register(RecurringExpense)
-admin.site.register(Expense)
-admin.site.register(Income)
-admin.site.register(Special)
+admin.site.register(Entry)
+admin.site.register(CheckIn)
+admin.site.register(SavingsGoal)
+admin.site.register(SavingsTransaction)
