@@ -11,8 +11,6 @@ LANGUAGES = [
     ('fr', _('French')),
 ]
 
-LANGUAGE_CODE = 'en'
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
