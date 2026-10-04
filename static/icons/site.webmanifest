@@ -1,0 +1,16 @@
+{
+    "name": "va8ti",
+    "short_name": "va8ti",
+    "description": "Know how much you can freely spend each day.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "theme_color": "#065F46",
+    "background_color": "#F2F5F3",
+    "icons": [
+        {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+        {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+        {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+    ]
+}

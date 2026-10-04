@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% load i18n money %}
+{% load i18n money static %}
 
 {% block title %}{% trans "Home" %}{% endblock %}
 {% block app_class %}app--wide{% endblock %}
 
 {% block content %}
 <div class="topbar">
-    <a href="{% url 'home' %}" class="logo">va8ti</a>
+    <a href="{% url 'home' %}" class="logo"><img src="{% static 'icons/icon.svg' %}" alt="" width="32" height="32">va8ti</a>
     {% if cycle %}
     <button type="button" class="btn-pill" id="aiAskBtn" data-url="{% url 'get_ai_advice' %}">
         <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
