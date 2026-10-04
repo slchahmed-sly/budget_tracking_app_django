@@ -8,25 +8,19 @@
 
 <form method="post" class="sheet" novalidate>
     {% csrf_token %}
-    <h1>{% if direction == 'in' %}{% blocktrans with name=goal.name %}Add money to {{ name }}{% endblocktrans %}{% else %}{% blocktrans with name=goal.name %}Withdraw from {{ name }}{% endblocktrans %}{% endif %}</h1>
-    <p class="lead">
-        {% if direction == 'in' %}
-        {% trans "This moves money out of your balance: it shows as an expense in the current cycle." %}
-        {% else %}
-        {% trans "This moves money back into your balance: it shows as income in the current cycle." %}
-        {% endif %}
-    </p>
+    <h1>{% blocktrans with name=goal.name %}Add money to {{ name }}{% endblocktrans %}</h1>
+    <p class="lead">{% trans "This moves money out of your balance: it shows as an expense in the current cycle." %}</p>
 
     <div class="field">
         <label for="{{ form.amount.id_for_label }}">{% trans "Amount" %}</label>
-        <div class="big-amount {% if direction == 'in' %}is-expense{% else %}is-income{% endif %}">{{ form.amount }}</div>
+        <div class="big-amount is-expense">{{ form.amount }}</div>
         <div class="help">{% blocktrans with saved=goal.saved|money target=goal.target|money %}Saved so far: {{ saved }} of {{ target }}{% endblocktrans %}</div>
         {{ form.amount.errors }}
     </div>
 
     <div class="actions">
         <a href="{% url 'savings' %}" class="btn btn-outline">{% trans "Cancel" %}</a>
-        <button type="submit" class="btn btn-primary">{% if direction == 'in' %}{% trans "Add money" %}{% else %}{% trans "Withdraw" %}{% endif %}</button>
+        <button type="submit" class="btn btn-primary">{% trans "Add money" %}</button>
     </div>
 </form>
 {% endblock %}

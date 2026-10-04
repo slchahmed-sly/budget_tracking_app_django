@@ -143,18 +143,6 @@ class Entry(models.Model):
             existing.delete()
 
 
-class CheckIn(models.Model):
-    cycle = models.ForeignKey(Cycle, on_delete=models.CASCADE, related_name='checkins')
-    balance = models.IntegerField(_('Current balance'))
-    created_at = models.DateTimeField(default=timezone.now)
-
-    class Meta:
-        ordering = ['-created_at', '-pk']
-
-    def __str__(self):
-        return f'{self.balance} @ {self.created_at:%Y-%m-%d}'
-
-
 class SavingsTransaction(models.Model):
     goal = models.ForeignKey(SavingsGoal, on_delete=models.CASCADE, related_name='transactions')
     # Positive: money added to the goal. Negative: money taken out.

@@ -102,12 +102,9 @@
         if (!d) return;
         const impact = document.getElementById('impact');
         const amount = parseInt(form.querySelector('input[name="amount"]').value || '0', 10) || 0;
-        let delta = contribution(value('kind'), value('certainty'), amount) - contribution(d.kind, d.certainty, d.amount);
-        if (d.inBalance) delta = 0;  // already paid before the last check-in
+        const delta = contribution(value('kind'), value('certainty'), amount) - contribution(d.kind, d.certainty, d.amount);
         if (!delta) { impact.hidden = true; return; }
-        const newPerDay = d.hasCheckin
-            ? Math.round((d.freeLeft + delta) / d.daysLeft)
-            : Math.round((d.freeMoney + delta) / d.totalDays);
+        const newPerDay = Math.round((d.freeMoney + delta) / d.daysLeft);
         document.getElementById('impactDelta').textContent = (delta > 0 ? '+' : '') + fmt(delta);
         document.getElementById('impactDay').textContent = fmt(d.perDay) + ' → ' + fmt(newPerDay) + " {% trans '/ day' %}";
         impact.classList.toggle('is-worse', delta < 0);
