@@ -35,15 +35,6 @@ class EntryForm(forms.ModelForm):
         }
 
 
-class CheckInForm(forms.ModelForm):
-    class Meta:
-        model = models.CheckIn
-        fields = ['balance']
-        widgets = {
-            'balance': forms.NumberInput(attrs={'inputmode': 'numeric', 'autofocus': True}),
-        }
-
-
 class RecurringExpenseForm(forms.ModelForm):
     class Meta:
         model = models.RecurringExpense

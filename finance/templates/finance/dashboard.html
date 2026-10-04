@@ -57,24 +57,10 @@
                 </div>
             </div>
 
-            <div class="pace pace--{{ s.pace }}">
-                <div class="pace-row">
-                    <span>{% trans "Free money left" %}</span>
-                    <strong>{% blocktrans with left=s.free_left|money total=s.free_money|money %}{{ left }} of {{ total }}{% endblocktrans %}</strong>
-                </div>
-                <div class="pace-track" role="img" aria-label="{% blocktrans with left=s.left_percent expected=s.expected_percent %}{{ left }}% of free money left, {{ expected }}% expected today{% endblocktrans %}">
-                    <div class="pace-fill" style="width: {{ s.left_percent }}%"></div>
-                    <div class="pace-marker" style="left: {{ s.expected_percent }}%"></div>
-                </div>
-                <div class="pace-row">
-                    <span>{% trans "Line = where you should be today" %}</span>
-                    <span class="pace-status">
-                        {% if s.pace == 'on_track' %}{% trans "On track" %}{% elif s.pace == 'a_bit_fast' %}{% trans "A bit fast" %}{% else %}{% trans "Too fast" %}{% endif %}
-                    </span>
-                </div>
+            <div class="hero-free">
+                <span>{% trans "Free money this cycle" %}</span>
+                <strong class="{% if s.free_money < 0 %}is-negative{% endif %}">{{ s.free_money|money }} {{ cycle.currency_symbol }}</strong>
             </div>
-
-            <a href="{% url 'checkin' %}" class="btn btn-white">{% trans "Check in my balance" %}</a>
         </section>
 
         <nav class="quick" aria-label="{% trans 'Add' %}">
@@ -100,7 +86,6 @@
             <div class="totals">
                 <div><small>{% trans "Income" %}</small><strong class="text-income">{{ s.income|signed_money }}</strong></div>
                 <div><small>{% trans "Expenses" %}</small><strong class="text-expense">−{{ s.expenses|money }}</strong></div>
-                <div><small>{% trans "Free money" %}</small><strong>{{ s.free_money|money }}</strong></div>
             </div>
             <div class="rows">
                 {% for e in s.certain_entries %}
@@ -114,7 +99,7 @@
                     </form>
                     <div class="row-main">
                         <div class="row-title">{% if e.goal_id %}{% if e.is_income %}{% trans "From savings" %}{% else %}{% trans "To savings" %}{% endif %} · {% endif %}{{ e.title }}</div>
-                        <div class="row-sub {% if e.is_debt and not e.is_done %}warn{% endif %}">
+                        <div class="row-sub {% if e.is_debt and not e.is_done %}{% if e.is_income %}owed{% else %}warn{% endif %}{% endif %}">
                             {% if e.is_debt %}{% if e.is_income %}{% trans "Owed to me" %}{% else %}{% trans "I owe" %}{% endif %} · {% endif %}
                             {% if e.is_done %}{% if e.goal_id %}{% trans "Transferred" %}{% elif e.is_income %}{% trans "Received" %}{% else %}{% trans "Paid" %}{% endif %}{% else %}{% if e.is_income %}{% trans "Not received yet" %}{% else %}{% trans "Not paid yet" %}{% endif %}{% endif %}
                             {% if e.previous_amount is not None %} · {% blocktrans with amount=e.previous_amount|money %}changed from {{ amount }}{% endblocktrans %}{% endif %}

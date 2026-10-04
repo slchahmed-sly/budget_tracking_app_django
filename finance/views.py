@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -100,12 +100,8 @@ class EditEntryView(LoginRequiredMixin, View):
             'cycle': entry.cycle,
             'impact': {
                 'perDay': s.per_day,
-                'freeLeft': s.free_left,
                 'freeMoney': s.free_money,
                 'daysLeft': s.days_left,
-                'totalDays': s.total_days,
-                'hasCheckin': s.checkin is not None,
-                'inBalance': bool(s.checkin and budget.is_reflected(entry, s.checkin)),
                 'kind': entry.kind,
                 'certainty': entry.certainty,
                 'amount': entry.amount,
@@ -142,39 +138,6 @@ class ConfirmEntryView(LoginRequiredMixin, View):
         entry.save()
         entry.sync_savings()
         return redirect('home')
-
-
-# --- Balance check-in ---
-
-class CheckInView(LoginRequiredMixin, View):
-    def get(self, request):
-        cycle = get_active_cycle(request.user)
-        if not cycle:
-            return redirect('start_cycle')
-        return render(request, 'finance/checkin.html', self.context(cycle, forms.CheckInForm()))
-
-    def post(self, request):
-        cycle = get_active_cycle(request.user)
-        if not cycle:
-            return redirect('start_cycle')
-        form = forms.CheckInForm(request.POST)
-        if form.is_valid():
-            checkin = form.save(commit=False)
-            checkin.cycle = cycle
-            checkin.save()
-            return redirect('home')
-        return render(request, 'finance/checkin.html', self.context(cycle, form))
-
-    def context(self, cycle, form):
-        summary = budget.summarize(cycle)
-        unsettled = [e for e in summary.certain_entries if not e.is_done]
-        return {
-            'form': form,
-            'cycle': cycle,
-            's': summary,
-            'unsettled': unsettled,
-            'unsettled_total': budget.unsettled_total(unsettled),
-        }
 
 
 # --- Cycles ---
@@ -377,43 +340,26 @@ class DeleteGoalView(LoginRequiredMixin, View):
 
 
 class GoalTransferView(LoginRequiredMixin, View):
-    """Move money between the balance and a goal.
-
-    'in'  = balance -> goal: an expense in the current cycle.
-    'out' = goal -> balance: an income in the current cycle.
-    """
-    def dispatch(self, request, *args, **kwargs):
-        if kwargs.get('direction') not in ('in', 'out'):
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, pk, direction):
+    """Move money from the balance into a goal: an expense in the current cycle."""
+    def get(self, request, pk):
         goal = get_object_or_404(models.SavingsGoal, user=request.user, pk=pk)
-        return render(request, 'finance/goal_transfer.html', {
-            'form': forms.TransferForm(), 'goal': goal, 'direction': direction,
-        })
+        return render(request, 'finance/goal_transfer.html', {'form': forms.TransferForm(), 'goal': goal})
 
-    def post(self, request, pk, direction):
+    def post(self, request, pk):
         goal = get_object_or_404(models.SavingsGoal, user=request.user, pk=pk)
         form = forms.TransferForm(request.POST)
         if not form.is_valid():
-            return render(request, 'finance/goal_transfer.html', {'form': form, 'goal': goal, 'direction': direction})
+            return render(request, 'finance/goal_transfer.html', {'form': form, 'goal': goal})
 
         amount = form.cleaned_data['amount']
         cycle = get_active_cycle(request.user)
         if cycle:
-            entry = models.Entry(
-                cycle=cycle,
-                kind=models.Entry.EXPENSE if direction == 'in' else models.Entry.INCOME,
-                title=goal.name,
-                amount=amount,
-                goal=goal,
-            )
+            entry = models.Entry(cycle=cycle, kind=models.Entry.EXPENSE, title=goal.name, amount=amount, goal=goal)
             entry.set_done(True)
             entry.save()
             entry.sync_savings()
         else:
-            models.SavingsTransaction.objects.create(goal=goal, amount=amount if direction == 'in' else -amount)
+            models.SavingsTransaction.objects.create(goal=goal, amount=amount)
         return redirect('savings')
 
 
@@ -429,7 +375,7 @@ class GetAIAdviceView(LoginRequiredMixin, View):
         entries = list(cycle.entries.select_related('goal'))
         ai_context = {
             'remaining_days': s.days_left,
-            'main_budget': s.free_left,
+            'main_budget': s.free_money,
             'daily_allowance': s.per_day,
             'currency': cycle.currency_symbol,
             'uncertain_total': s.pending_net,

@@ -46,37 +46,24 @@ class SummaryTests(BaseTestCase):
         self.assertEqual(s.free_money, 6500)
         self.assertEqual(s.pending_net, 1800)
 
-    def test_without_checkin_allowance_does_not_grow_over_time(self):
-        self.entry(Entry.INCOME, 3100)
-        first = budget.summarize(self.cycle, today=self.cycle.start)
-        later = budget.summarize(self.cycle, today=self.cycle.end - timedelta(days=2))
-        self.assertEqual(first.per_day, 100)
-        self.assertEqual(later.per_day, 100)
-
-    def test_checkin_drives_free_money_left(self):
-        self.entry(Entry.INCOME, 20000, done=True)
-        self.entry(Entry.EXPENSE, 9500, done=True)
-        self.entry(Entry.EXPENSE, 800)  # not paid yet
-        models.CheckIn.objects.create(cycle=self.cycle, balance=6200)
+    def test_daily_amount_is_free_money_over_days_left(self):
+        self.entry(Entry.INCOME, 27800)
+        self.entry(Entry.EXPENSE, 12300)
+        self.entry(Entry.INCOME, 2000, Entry.PROBABLE)
 
         s = budget.summarize(self.cycle)
-        self.assertEqual(s.free_left, 5400)
-        self.assertEqual(s.per_day, 300)
+        self.assertEqual(s.free_money, 15500)
+        self.assertEqual(s.per_day, round(15500 / 18))
+        self.assertEqual(s.potential_per_day, round(17500 / 18))
 
-    def test_paying_after_checkin_does_not_change_free_money(self):
-        debt = self.entry(Entry.EXPENSE, 800)
-        models.CheckIn.objects.create(cycle=self.cycle, balance=6200,
-                                      created_at=timezone.now() - timedelta(hours=1))
-        before = budget.summarize(self.cycle).free_left
-
-        debt.set_done(True)
-        debt.save()
-        self.assertEqual(budget.summarize(self.cycle).free_left, before)
-
-    def test_pace_flags_spending_too_fast(self):
-        self.entry(Entry.INCOME, 3100, done=True)
-        models.CheckIn.objects.create(cycle=self.cycle, balance=100)
-        self.assertEqual(budget.summarize(self.cycle).pace, budget.TOO_FAST)
+    def test_ticking_paid_or_received_does_not_change_the_numbers(self):
+        income = self.entry(Entry.INCOME, 20000)
+        self.entry(Entry.EXPENSE, 9500)
+        before = budget.summarize(self.cycle)
+        income.set_done(True)
+        income.save()
+        after = budget.summarize(self.cycle)
+        self.assertEqual((before.free_money, before.per_day), (after.free_money, after.per_day))
 
 
 class EntryViewTests(BaseTestCase):
@@ -86,6 +73,13 @@ class EntryViewTests(BaseTestCase):
         response = self.client.get(reverse('home'))
         self.assertContains(response, 'Salary')
         self.assertContains(response, 'Laptop repair')
+        self.assertContains(response, 'Free money this cycle')
+
+    def test_money_owed_to_me_is_shown_as_income(self):
+        self.entry(Entry.INCOME, 2000, is_debt=True, title='Moulay')
+        response = self.client.get(reverse('home'))
+        self.assertContains(response, 'class="row-sub owed"')
+        self.assertNotContains(response, 'class="row-sub warn"')
 
     def test_dashboard_without_cycle_invites_to_start(self):
         self.cycle.delete()
@@ -138,10 +132,6 @@ class EntryViewTests(BaseTestCase):
             for pk in (foreign.pk, 9999):
                 self.assertEqual(self.client.get(reverse(name, args=[pk])).status_code, 404)
 
-    def test_checkin(self):
-        self.client.post(reverse('checkin'), {'balance': 6200})
-        self.assertEqual(self.cycle.checkins.get().balance, 6200)
-
     @mock.patch('finance.ai_utils.get_financial_advice', return_value='ok')
     def test_ai_advice(self, advice):
         self.entry(Entry.INCOME, 20000)
@@ -191,18 +181,13 @@ class SavingsTests(BaseTestCase):
         self.client.post(reverse('toggle_entry_done', args=[e.pk]))
         self.assertEqual(self.goal.saved, 0)
 
-    def test_add_and_withdraw(self):
-        self.client.post(reverse('goal_transfer', args=[self.goal.pk, 'in']), {'amount': 3000})
-        self.client.post(reverse('goal_transfer', args=[self.goal.pk, 'out']), {'amount': 1000})
-        self.assertEqual(self.goal.saved, 2000)
-        kinds = sorted(self.cycle.entries.values_list('kind', 'amount'))
-        self.assertEqual(kinds, [('expense', 3000), ('income', 1000)])
-
-    def test_bad_direction_is_404(self):
-        self.assertEqual(self.client.get(f'/savings/goal/{self.goal.pk}/sideways/').status_code, 404)
+    def test_add_money(self):
+        self.client.post(reverse('goal_transfer', args=[self.goal.pk]), {'amount': 3000})
+        self.assertEqual(self.goal.saved, 3000)
+        self.assertEqual(list(self.cycle.entries.values_list('kind', 'amount')), [('expense', 3000)])
 
     def test_savings_page_renders(self):
-        self.client.post(reverse('goal_transfer', args=[self.goal.pk, 'in']), {'amount': 3000})
+        self.client.post(reverse('goal_transfer', args=[self.goal.pk]), {'amount': 3000})
         response = self.client.get(reverse('savings'))
         self.assertContains(response, 'Laptop')
 

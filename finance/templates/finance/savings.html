@@ -72,8 +72,7 @@
                     {% endif %}
                 </div>
                 <div class="goal-actions">
-                    <a href="{% url 'goal_transfer' goal.pk 'in' %}" class="btn btn-sm btn-primary">{% trans "Add money" %}</a>
-                    <a href="{% url 'goal_transfer' goal.pk 'out' %}" class="btn btn-sm btn-outline">{% trans "Withdraw" %}</a>
+                    <a href="{% url 'goal_transfer' goal.pk %}" class="btn btn-sm btn-primary">{% trans "Add money" %}</a>
                 </div>
             </div>
             {% empty %}
