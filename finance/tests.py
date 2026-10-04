@@ -73,7 +73,7 @@ class EntryViewTests(BaseTestCase):
         response = self.client.get(reverse('home'))
         self.assertContains(response, 'Salary')
         self.assertContains(response, 'Laptop repair')
-        self.assertContains(response, 'Free money this cycle')
+        self.assertContains(response, 'class="hero-free"')
 
     def test_money_owed_to_me_is_shown_as_income(self):
         self.entry(Entry.INCOME, 2000, is_debt=True, title='Moulay')
