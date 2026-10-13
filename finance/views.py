@@ -36,7 +36,7 @@ class DashBoardView(LoginRequiredMixin, View):
             'cycle': cycle,
             's': summary,
             'savings_total': savings_total(request.user),
-            'goal_count': request.user.savings_goals.count(),
+            'goals': list(request.user.savings_goals.all()),
             'cycle_saved': cycle_saved,
         })
 
@@ -288,7 +288,7 @@ class SavingsView(LoginRequiredMixin, View):
         chart = {
             'history': history,
             'total': running,
-            'goals': [{'name': g.name, 'months': g.months_left} for g in goals],
+            'goals': [{'name': g.name, 'months': g.months_left, 'target': g.target, 'saved': g.saved} for g in goals],
             'per_month': sum(g.monthly_amount for g in goals),
         }
         return render(request, 'finance/savings.html', {

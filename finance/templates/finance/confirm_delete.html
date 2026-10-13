@@ -3,6 +3,8 @@
 
 {% block title %}{% trans "Delete" %}{% endblock %}
 
+{% block body_class %}is-form{% endblock %}
+
 {% block content %}
 <form method="post" class="sheet">
     {% csrf_token %}

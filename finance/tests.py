@@ -56,6 +56,25 @@ class SummaryTests(BaseTestCase):
         self.assertEqual(s.per_day, round(15500 / 18))
         self.assertEqual(s.potential_per_day, round(17500 / 18))
 
+    def test_still_to_receive_and_to_pay(self):
+        self.entry(Entry.INCOME, 25000)
+        self.entry(Entry.INCOME, 800, done=True)
+        self.entry(Entry.EXPENSE, 5500, done=True)
+        self.entry(Entry.EXPENSE, 3000)
+        self.entry(Entry.EXPENSE, 500)
+
+        s = budget.summarize(self.cycle)
+        self.assertEqual((s.incoming.open_total, s.incoming.done_total), (25000, 800))
+        self.assertEqual((s.outgoing.open_total, s.outgoing.done_total), (3500, 5500))
+        self.assertEqual(s.outgoing.dots, [True, False, False])
+        self.assertEqual(s.planned_percent, round(9000 * 100 / 25800))
+        self.assertEqual(s.day_number, 14)
+
+    def test_no_progress_dots_when_there_are_too_many_items(self):
+        for _ in range(budget.MAX_PROGRESS_DOTS + 1):
+            self.entry(Entry.EXPENSE, 10)
+        self.assertEqual(budget.summarize(self.cycle).outgoing.dots, [])
+
     def test_ticking_paid_or_received_does_not_change_the_numbers(self):
         income = self.entry(Entry.INCOME, 20000)
         self.entry(Entry.EXPENSE, 9500)
@@ -73,7 +92,17 @@ class EntryViewTests(BaseTestCase):
         response = self.client.get(reverse('home'))
         self.assertContains(response, 'Salary')
         self.assertContains(response, 'Laptop repair')
-        self.assertContains(response, 'class="hero-free"')
+        self.assertContains(response, 'hero-free')
+        self.assertContains(response, 'id="panel-in"')
+        self.assertContains(response, 'id="panel-out"')
+
+    def test_not_sure_tile_only_when_there_is_something_uncertain(self):
+        self.entry(Entry.INCOME, 20000)
+        self.assertContains(self.client.get(reverse('home')), 'tiles--two')
+        self.entry(Entry.INCOME, 3000, Entry.PROBABLE)
+        response = self.client.get(reverse('home'))
+        self.assertNotContains(response, 'tiles--two')
+        self.assertContains(response, 'tile--pending')
 
     def test_money_owed_to_me_is_shown_as_income(self):
         self.entry(Entry.INCOME, 2000, is_debt=True, title='Moulay')
