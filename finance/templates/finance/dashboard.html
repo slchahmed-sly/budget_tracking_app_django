@@ -5,23 +5,55 @@
 {% block app_class %}app--wide{% endblock %}
 
 {% block content %}
-<div class="topbar">
-    <a href="{% url 'home' %}" class="logo"><img src="{% static 'icons/icon.svg' %}" alt="" width="32" height="32">va8ti</a>
-    {% if cycle %}
-    <button type="button" class="btn-pill" id="aiAskBtn" data-url="{% url 'get_ai_advice' %}">
-        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
-        <span>{% trans "Ask AI" %}</span>
-    </button>
-    {% endif %}
-</div>
-
 {% if not cycle %}
+<div class="topbar mobile-only">
+    <a href="{% url 'home' %}" class="logo"><img src="{% static 'icons/icon.svg' %}" alt="" width="32" height="32">va8ti</a>
+    <a href="{% url 'settings' %}" class="icon-button" aria-label="{% trans 'Settings' %}">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+    </a>
+</div>
 <section class="card welcome">
     <h1>{% trans "Start your first cycle" %}</h1>
     <p>{% trans "Pick the dates between two paydays, add what comes in and what has to go out, and va8ti tells you how much you can freely spend each day." %}</p>
     <a href="{% url 'start_cycle' %}" class="btn btn-primary">{% trans "Start a cycle" %}</a>
 </section>
 {% else %}
+
+{# Phone header #}
+<div class="topbar mobile-only">
+    <a href="{% url 'settings' %}" class="cycle-head">
+        <img src="{% static 'icons/icon.svg' %}" alt="" width="34" height="34">
+        <span>
+            <strong>{{ cycle.title }}</strong>
+            <small>{% blocktrans with day=s.day_number total=s.total_days %}Day {{ day }} of {{ total }}{% endblocktrans %}</small>
+        </span>
+    </a>
+    <div class="topbar-actions">
+        <button type="button" class="icon-button js-ask-ai" aria-label="{% trans 'Ask AI' %}">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
+        </button>
+        <a href="{% url 'settings' %}" class="icon-button" aria-label="{% trans 'Settings' %}">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+        </a>
+    </div>
+</div>
+
+{# Big-screen header #}
+<div class="page-head desktop-only">
+    <div>
+        <h1 class="page-title">{% trans "Home" %}</h1>
+        <div class="text-muted">{% blocktrans with day=s.day_number total=s.total_days %}Day {{ day }} of {{ total }}{% endblocktrans %}</div>
+    </div>
+    <div class="page-head-actions">
+        <button type="button" class="btn-pill js-ask-ai">
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
+            {% trans "Ask AI" %}
+        </button>
+        <a href="{% url 'add_entry' %}?kind=income" class="btn btn-sm btn-soft-income">+ {% trans "Income" %}</a>
+        <a href="{% url 'add_entry' %}?kind=expense" class="btn btn-sm btn-soft-expense">− {% trans "Expense" %}</a>
+        <a href="{% url 'add_entry' %}?certainty=probable" class="btn btn-sm btn-soft-pending">? {% trans "Not sure yet" %}</a>
+    </div>
+</div>
 
 <section class="ai-card" id="aiCard" hidden aria-live="polite">
     <div class="card-head">
@@ -31,97 +63,123 @@
     <div class="ai-text" id="aiText"></div>
 </section>
 
-<div class="columns">
-    <div>
-        <section class="hero" aria-label="{% trans 'Free money' %}">
-            <div class="hero-top">
-                <div>
-                    <div class="hero-label">{% trans "Free to spend per day" %}</div>
-                    <div class="hero-number {% if s.per_day < 0 %}hero-negative{% endif %}">
-                        <strong>{{ s.per_day|money }}</strong><span>{{ cycle.currency_symbol }}</span>
-                    </div>
-                    {% if s.pending_entries %}
-                    <div class="hero-sub">{% blocktrans with amount=s.potential_per_day|money %}{{ amount }} / day if pending comes through{% endblocktrans %}</div>
-                    {% endif %}
+<div class="dash-top">
+    <section class="hero" aria-label="{% trans 'Free money' %}">
+        <div class="hero-top">
+            <div>
+                <div class="hero-label">{% trans "You can spend today" %}</div>
+                <div class="hero-number {% if s.per_day < 0 %}hero-negative{% endif %}">
+                    <strong>{{ s.per_day|money }}</strong><span>{{ cycle.currency_symbol }}</span>
                 </div>
-                <div class="ring">
-                    <svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true">
-                        <defs><linearGradient id="dayRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FDE68A"/><stop offset="100%" stop-color="#34D399"/></linearGradient></defs>
-                        <circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="9"/>
-                        <circle cx="52" cy="52" r="44" fill="none" stroke="url(#dayRing)" stroke-width="9" stroke-linecap="round" stroke-dasharray="{{ s.ring_dash|stringformat:'s' }} 277" transform="rotate(-90 52 52)"/>
-                    </svg>
-                    <div class="ring-label">
-                        <strong>{{ s.days_left }}</strong>
-                        <span>{% blocktrans count days=s.days_left %}day left{% plural %}days left{% endblocktrans %}</span>
-                    </div>
+                {% if s.pending_entries %}
+                <div class="hero-sub">{% blocktrans with amount=s.potential_per_day|money %}{{ amount }} if pending comes through{% endblocktrans %}</div>
+                {% endif %}
+            </div>
+            <div class="ring">
+                <svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true">
+                    <defs><linearGradient id="dayRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FDE68A"/><stop offset="100%" stop-color="#34D399"/></linearGradient></defs>
+                    <circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="9"/>
+                    <circle cx="52" cy="52" r="44" fill="none" stroke="url(#dayRing)" stroke-width="9" stroke-linecap="round" stroke-dasharray="{{ s.ring_dash|stringformat:'s' }} 277" transform="rotate(-90 52 52)"/>
+                </svg>
+                <div class="ring-label">
+                    <strong>{{ s.days_left }}</strong>
+                    <span>{% blocktrans count days=s.days_left %}day left{% plural %}days left{% endblocktrans %}</span>
                 </div>
             </div>
+        </div>
+        <div class="hero-free mobile-only">
+            <span>{% trans "Free money this cycle" %}</span>
+            <strong class="{% if s.free_money < 0 %}is-negative{% endif %}">{{ s.free_money|money }} {{ cycle.currency_symbol }}</strong>
+        </div>
+    </section>
 
-            <div class="hero-free">
-                <span>{% trans "Free money this cycle" %}</span>
-                <strong class="{% if s.free_money < 0 %}is-negative{% endif %}">{{ s.free_money|money }} {{ cycle.currency_symbol }}</strong>
-            </div>
-        </section>
+    <section class="stat desktop-only">
+        <span class="stat-label">{% trans "Free money this cycle" %}</span>
+        <strong class="stat-value {% if s.free_money < 0 %}text-expense{% endif %}">{{ s.free_money|money }}</strong>
+        <span class="stat-note">{% trans "Income minus expenses you're sure of" %}</span>
+    </section>
 
-        <nav class="quick" aria-label="{% trans 'Add' %}">
-            <a href="{% url 'add_entry' %}?kind=income" class="q-income">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-                {% trans "Income" %}
-            </a>
-            <a href="{% url 'add_entry' %}?kind=expense" class="q-expense">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-                {% trans "Expense" %}
-            </a>
-            <a href="{% url 'add_entry' %}?certainty=probable" class="q-pending">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
-                {% trans "Not sure yet" %}
-            </a>
-        </nav>
+    <section class="stat stat--split desktop-only">
+        <div class="stat-line"><span class="stat-label">{% trans "In" %}</span><b class="text-income">{{ s.income|signed_money }}</b></div>
+        <div class="stat-line"><span class="stat-label">{% trans "Out" %}</span><b class="text-expense">−{{ s.expenses|money }}</b></div>
+        <div class="planned-bar" aria-hidden="true"><div style="width: {% if s.planned_percent > 100 %}100{% else %}{{ s.planned_percent }}{% endif %}%"></div></div>
+        <span class="stat-note">{% blocktrans with percent=s.planned_percent %}{{ percent }}% of income already planned{% endblocktrans %}</span>
+    </section>
+</div>
 
-        <section class="card">
-            <div class="card-head">
-                <h2 class="card-title">{% trans "This cycle's plan" %}</h2>
-                <span class="card-hint">{% trans "Tap any amount to edit" %}</span>
-            </div>
-            <div class="totals">
-                <div><small>{% trans "Income" %}</small><strong class="text-income">{{ s.income|signed_money }}</strong></div>
-                <div><small>{% trans "Expenses" %}</small><strong class="text-expense">−{{ s.expenses|money }}</strong></div>
-            </div>
-            <div class="rows">
-                {% for e in s.certain_entries %}
-                <div class="row">
-                    <form method="post" action="{% url 'toggle_entry_done' e.pk %}" class="inline">
-                        {% csrf_token %}
-                        <button type="submit" class="tick {% if e.is_done %}is-done{% endif %}"
-                                aria-label="{% if e.is_done %}{% trans 'Mark as not done' %}{% elif e.is_income %}{% trans 'Mark as received' %}{% else %}{% trans 'Mark as paid' %}{% endif %}">
-                            <span>{% if e.is_done %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>{% endif %}</span>
-                        </button>
-                    </form>
-                    <div class="row-main">
-                        <div class="row-title">{% if e.goal_id %}{% if e.is_income %}{% trans "From savings" %}{% else %}{% trans "To savings" %}{% endif %} · {% endif %}{{ e.title }}</div>
-                        <div class="row-sub {% if e.is_debt and not e.is_done %}{% if e.is_income %}owed{% else %}warn{% endif %}{% endif %}">
-                            {% if e.is_debt %}{% if e.is_income %}{% trans "Owed to me" %}{% else %}{% trans "I owe" %}{% endif %} · {% endif %}
-                            {% if e.is_done %}{% if e.goal_id %}{% trans "Transferred" %}{% elif e.is_income %}{% trans "Received" %}{% else %}{% trans "Paid" %}{% endif %}{% else %}{% if e.is_income %}{% trans "Not received yet" %}{% else %}{% trans "Not paid yet" %}{% endif %}{% endif %}
-                            {% if e.previous_amount is not None %} · {% blocktrans with amount=e.previous_amount|money %}changed from {{ amount }}{% endblocktrans %}{% endif %}
-                        </div>
-                    </div>
-                    <a href="{% url 'edit_entry' e.pk %}" class="amount-btn {{ e.kind }}" aria-label="{% blocktrans with title=e.title %}Edit {{ title }}{% endblocktrans %}">{{ e.signed_amount|signed_money }}</a>
-                </div>
-                {% empty %}
-                <p class="empty">{% trans "Nothing planned yet. Add your income and the expenses you have to cover." %}</p>
-                {% endfor %}
-            </div>
-        </section>
-    </div>
+{# Phone: what is still left to happen this cycle #}
+<div class="tiles mobile-only {% if not s.pending_entries %}tiles--two{% endif %}">
+    <a href="#plan" class="tile" data-show-panel="in">
+        <span class="tile-head"><span class="badge badge--in" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span>{% trans "To receive" %}</span>
+        <strong class="text-income">{{ s.incoming.open_total|signed_money }}</strong>
+        <span class="progress">
+            {% for done in s.incoming.dots %}<i class="dot dot--in {% if done %}is-on{% endif %}"></i>{% endfor %}
+            <small>{% blocktrans with done=s.incoming.done|length total=s.incoming.count %}{{ done }} of {{ total }}{% endblocktrans %}</small>
+        </span>
+    </a>
+    <a href="#plan" class="tile" data-show-panel="out">
+        <span class="tile-head"><span class="badge badge--out" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg></span>{% trans "To pay" %}</span>
+        <strong class="text-expense">−{{ s.outgoing.open_total|money }}</strong>
+        <span class="progress">
+            {% for done in s.outgoing.dots %}<i class="dot dot--out {% if done %}is-on{% endif %}"></i>{% endfor %}
+            <small>{% blocktrans with done=s.outgoing.done|length total=s.outgoing.count %}{{ done }} of {{ total }}{% endblocktrans %}</small>
+        </span>
+    </a>
+    {% if s.pending_entries %}
+    <a href="#pending" class="tile tile--pending">
+        <span class="tile-head"><span class="badge badge--pending" aria-hidden="true">?</span>{% trans "Not sure" %}</span>
+        <strong>{{ s.pending_net|signed_money }}</strong>
+        <span class="progress"><small>{% blocktrans count n=s.pending_entries|length %}{{ n }} item{% plural %}{{ n }} items{% endblocktrans %}</small></span>
+    </a>
+    {% endif %}
+</div>
 
-    <div>
+<div class="dash-main">
+    <section class="card plan" id="plan">
+        <div class="card-head desktop-only">
+            <h2 class="card-title">{% trans "This cycle's plan" %}</h2>
+            <span class="card-hint">{% trans "Click any amount to edit" %}</span>
+        </div>
+        <div class="tabs mobile-only" role="tablist" aria-label="{% trans "This cycle's plan" %}">
+            <button type="button" role="tab" id="tab-in" aria-controls="panel-in" aria-selected="false" data-tab="in">{% trans "In" %} <span class="text-income">{{ s.income|signed_money }}</span></button>
+            <button type="button" role="tab" id="tab-out" aria-controls="panel-out" aria-selected="true" data-tab="out">{% trans "Out" %} <span class="text-expense">−{{ s.expenses|money }}</span></button>
+        </div>
+        <div class="plan-panels">
+            <div class="plan-panel" id="panel-in" role="tabpanel" aria-labelledby="tab-in">
+                <div class="panel-title panel-title--in desktop-only"><span>{% trans "In" %}</span><span>{{ s.income|signed_money }}</span></div>
+                {% if s.incoming.open %}
+                <div class="group-label">{% blocktrans with amount=s.incoming.open_total|money %}To receive · {{ amount }}{% endblocktrans %}</div>
+                {% for e in s.incoming.open %}{% include 'finance/_entry_row.html' %}{% endfor %}
+                {% endif %}
+                {% if s.incoming.done %}
+                <div class="group-label">{% blocktrans with amount=s.incoming.done_total|money %}Received · {{ amount }}{% endblocktrans %}</div>
+                {% for e in s.incoming.done %}{% include 'finance/_entry_row.html' %}{% endfor %}
+                {% endif %}
+                {% if not s.incoming.count %}<p class="empty">{% trans "No income planned yet." %}</p>{% endif %}
+            </div>
+            <div class="plan-panel is-active" id="panel-out" role="tabpanel" aria-labelledby="tab-out">
+                <div class="panel-title panel-title--out desktop-only"><span>{% trans "Out" %}</span><span>−{{ s.expenses|money }}</span></div>
+                {% if s.outgoing.open %}
+                <div class="group-label">{% blocktrans with amount=s.outgoing.open_total|money %}To pay · {{ amount }}{% endblocktrans %}</div>
+                {% for e in s.outgoing.open %}{% include 'finance/_entry_row.html' %}{% endfor %}
+                {% endif %}
+                {% if s.outgoing.done %}
+                <div class="group-label">{% blocktrans with amount=s.outgoing.done_total|money %}Paid · {{ amount }}{% endblocktrans %}</div>
+                {% for e in s.outgoing.done %}{% include 'finance/_entry_row.html' %}{% endfor %}
+                {% endif %}
+                {% if not s.outgoing.count %}<p class="empty">{% trans "No expenses planned yet." %}</p>{% endif %}
+            </div>
+        </div>
+    </section>
+
+    <div class="dash-side">
         {% if s.pending_entries %}
-        <section class="pending">
+        <section class="pending" id="pending">
             <div class="pending-head">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
-                <h2>{% trans "Not confirmed yet" %}</h2>
+                <h2>{% trans "Not sure yet" %}</h2>
+                <span class="pending-total">{% blocktrans with amount=s.pending_net|signed_money %}{{ amount }} if all happen{% endblocktrans %}</span>
             </div>
-            <div class="pending-note">{% trans "Only counted in the “if pending comes through” amount." %}</div>
             {% for e in s.pending_entries %}
             <div class="pending-item">
                 <div class="row-main">
@@ -144,17 +202,19 @@
         </section>
         {% endif %}
 
-        <a href="{% url 'savings' %}" class="link-card">
-            <span class="link-icon">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>
+        <a href="{% url 'savings' %}" class="card savings-card">
+            <span class="card-head">
+                <span class="card-title">{% blocktrans with amount=savings_total|money currency=cycle.currency_symbol %}Savings · {{ amount }} {{ currency }}{% endblocktrans %}</span>
+                <span class="see-all">{% trans "See all" %} →</span>
             </span>
-            <span class="row-main">
-                <span class="row-title" style="font-weight: 800; display: block">{% blocktrans with amount=savings_total|money currency=cycle.currency_symbol %}{{ amount }} {{ currency }} saved{% endblocktrans %}</span>
-                <span class="row-sub">
-                    {% blocktrans count goals=goal_count %}{{ goals }} goal{% plural %}{{ goals }} goals{% endblocktrans %}{% if cycle_saved %} · {% blocktrans with amount=cycle_saved|signed_money %}{{ amount }} this cycle{% endblocktrans %}{% endif %}
-                </span>
+            {% for goal in goals %}
+            <span class="mini-goal">
+                <span class="mini-goal-head"><b>{{ goal.name }}</b><span>{{ goal.percent }}%</span></span>
+                <span class="bar"><span style="width: {{ goal.percent }}%"></span></span>
             </span>
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#4B5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            {% empty %}
+            <span class="text-muted">{% trans "No goals yet. Create one to start saving towards it." %}</span>
+            {% endfor %}
         </a>
     </div>
 </div>
@@ -165,31 +225,36 @@
 {% if cycle %}
 <script>
 (function () {
-    const btn = document.getElementById('aiAskBtn');
+    // In / Out tabs (phone). On big screens both panels are shown side by side.
+    const tabs = document.querySelectorAll('[data-tab]');
+    function show(name) {
+        tabs.forEach((t) => t.setAttribute('aria-selected', t.dataset.tab === name ? 'true' : 'false'));
+        document.querySelectorAll('.plan-panel').forEach((p) => p.classList.toggle('is-active', p.id === 'panel-' + name));
+        try { localStorage.setItem('va8ti-plan-tab', name); } catch (e) {}
+    }
+    tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.tab)));
+    document.querySelectorAll('[data-show-panel]').forEach((a) => a.addEventListener('click', () => show(a.dataset.showPanel)));
+    try { const saved = localStorage.getItem('va8ti-plan-tab'); if (saved === 'in' || saved === 'out') show(saved); } catch (e) {}
+
+    // Ask AI
     const card = document.getElementById('aiCard');
     const text = document.getElementById('aiText');
-    const label = btn.querySelector('span');
-    const original = label.textContent;
-
     document.getElementById('aiClose').addEventListener('click', function () { card.hidden = true; });
-
-    btn.addEventListener('click', async function () {
-        btn.disabled = true;
-        label.textContent = "{% trans 'Thinking...' %}";
+    document.querySelectorAll('.js-ask-ai').forEach((btn) => btn.addEventListener('click', async function () {
+        document.querySelectorAll('.js-ask-ai').forEach((b) => b.disabled = true);
+        text.textContent = "{% trans 'Thinking...' %}";
+        card.hidden = false;
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         try {
-            const response = await fetch(btn.dataset.url);
+            const response = await fetch("{% url 'get_ai_advice' %}");
             const data = await response.json();
             text.textContent = data.advice || data.error || "{% trans 'Error. Try Again' %}";
-            card.hidden = false;
-            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (error) {
             text.textContent = "{% trans 'Error. Try Again' %}";
-            card.hidden = false;
         } finally {
-            btn.disabled = false;
-            label.textContent = original;
+            document.querySelectorAll('.js-ask-ai').forEach((b) => b.disabled = false);
         }
-    });
+    }));
 })();
 </script>
 {% endif %}

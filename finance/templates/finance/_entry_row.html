@@ -1,0 +1,19 @@
+{% load i18n money %}
+<div class="row {% if e.is_done %}is-done{% endif %}">
+    <form method="post" action="{% url 'toggle_entry_done' e.pk %}" class="inline">
+        {% csrf_token %}
+        <button type="submit" class="tick {% if e.is_done %}is-done{% endif %}"
+                aria-label="{% if e.is_done %}{% trans 'Mark as not done' %}{% elif e.is_income %}{% trans 'Mark as received' %}{% else %}{% trans 'Mark as paid' %}{% endif %}">
+            <span>{% if e.is_done %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>{% endif %}</span>
+        </button>
+    </form>
+    <div class="row-main">
+        <div class="row-title">{% if e.goal_id %}{% if e.is_income %}{% trans "From savings" %}{% else %}{% trans "To savings" %}{% endif %} · {% endif %}{{ e.title }}</div>
+        {% if e.is_debt or e.previous_amount is not None %}
+        <div class="row-sub {% if e.is_debt and not e.is_done %}{% if e.is_income %}owed{% else %}warn{% endif %}{% endif %}">
+            {% if e.is_debt %}{% if e.is_income %}{% trans "Owed to me" %}{% else %}{% trans "I owe" %}{% endif %}{% endif %}{% if e.is_debt and e.previous_amount is not None %} · {% endif %}{% if e.previous_amount is not None %}{% blocktrans with amount=e.previous_amount|money %}changed from {{ amount }}{% endblocktrans %}{% endif %}
+        </div>
+        {% endif %}
+    </div>
+    <a href="{% url 'edit_entry' e.pk %}" class="amount-btn {{ e.kind }}" aria-label="{% blocktrans with title=e.title %}Edit {{ title }}{% endblocktrans %}">{{ e.signed_amount|signed_money }}</a>
+</div>

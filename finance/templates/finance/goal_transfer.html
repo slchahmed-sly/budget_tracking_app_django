@@ -3,6 +3,8 @@
 
 {% block title %}{{ goal.name }}{% endblock %}
 
+{% block body_class %}is-form{% endblock %}
+
 {% block content %}
 <a href="{% url 'savings' %}" class="back-link">← {% trans "Back" %}</a>
 

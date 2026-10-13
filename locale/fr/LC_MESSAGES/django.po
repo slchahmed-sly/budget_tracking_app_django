@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 00:25+0300\n"
+"POT-Creation-Date: 2026-10-13 14:43+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,9 +30,10 @@ msgid "The end date must be after the start date."
 msgstr "La date de fin doit être après la date de début."
 
 #: finance/forms.py:60 finance/models.py:28 finance/models.py:86
-#: finance/templates/finance/entry_form.html:28
-#: finance/templates/finance/goal_transfer.html:15
-#: finance/templates/finance/recurring_form.html:20
+#: finance/templates/finance/entry_form.html:39
+#: finance/templates/finance/goal_transfer.html:17
+#: finance/templates/finance/recurring_form.html:22
+#: finance/templates/finance/savings.html:89
 msgid "Amount"
 msgstr "Montant"
 
@@ -48,7 +49,7 @@ msgstr "Date de fin"
 msgid "Title"
 msgstr "Titre"
 
-#: finance/models.py:13 finance/templates/finance/cycle_form.html:34
+#: finance/models.py:13 finance/templates/finance/cycle_form.html:36
 msgid "Currency"
 msgstr "Devise"
 
@@ -56,11 +57,11 @@ msgstr "Devise"
 msgid "Purpose"
 msgstr "Motif"
 
-#: finance/models.py:30 finance/templates/finance/settings.html:40
+#: finance/models.py:30 finance/templates/finance/settings.html:42
 msgid "Active"
 msgstr "Actif"
 
-#: finance/models.py:38 finance/templates/finance/cycle_form.html:17
+#: finance/models.py:38 finance/templates/finance/cycle_form.html:19
 msgid "Name"
 msgstr "Nom"
 
@@ -68,7 +69,7 @@ msgstr "Nom"
 msgid "Target"
 msgstr "Objectif"
 
-#: finance/models.py:40 finance/templates/finance/goal_form.html:24
+#: finance/models.py:40 finance/templates/finance/goal_form.html:26
 msgid "Amount per cycle"
 msgstr "Montant par cycle"
 
@@ -76,12 +77,13 @@ msgstr "Montant par cycle"
 msgid "Deadline"
 msgstr "Échéance"
 
-#: finance/models.py:70 finance/templates/finance/dashboard.html:69
-#: finance/templates/finance/dashboard.html:87
+#: finance/models.py:70 finance/templates/finance/dashboard.html:52
+#: templates/base.html:111
 msgid "Income"
 msgstr "Revenu"
 
-#: finance/models.py:71 finance/templates/finance/dashboard.html:73
+#: finance/models.py:71 finance/templates/finance/dashboard.html:53
+#: templates/base.html:115
 msgid "Expense"
 msgstr "Dépense"
 
@@ -97,11 +99,11 @@ msgstr "Probable"
 msgid "Uncertain"
 msgstr "Incertain"
 
-#: finance/models.py:84 finance/templates/finance/entry_form.html:16
+#: finance/models.py:84 finance/templates/finance/entry_form.html:20
 msgid "Type"
 msgstr "Type"
 
-#: finance/models.py:87 finance/templates/finance/entry_form.html:42
+#: finance/models.py:87 finance/templates/finance/entry_form.html:25
 msgid "How sure is it?"
 msgstr "À quel point est-ce sûr ?"
 
@@ -113,82 +115,122 @@ msgstr "Fait"
 msgid "Debt"
 msgstr "Dette"
 
-#: finance/models.py:94 finance/templates/finance/entry_form.html:59
+#: finance/models.py:94 finance/templates/finance/entry_form.html:65
 msgid "Note"
 msgstr "Note"
 
+#: finance/templates/finance/_entry_row.html:6
+msgid "Mark as not done"
+msgstr "Marquer comme non fait"
+
+#: finance/templates/finance/_entry_row.html:6
+msgid "Mark as received"
+msgstr "Marquer comme reçu"
+
+#: finance/templates/finance/_entry_row.html:6
+msgid "Mark as paid"
+msgstr "Marquer comme payé"
+
+#: finance/templates/finance/_entry_row.html:11
+msgid "From savings"
+msgstr "Depuis l'épargne"
+
+#: finance/templates/finance/_entry_row.html:11
+msgid "To savings"
+msgstr "Vers l'épargne"
+
+#: finance/templates/finance/_entry_row.html:14
+msgid "Owed to me"
+msgstr "On me doit"
+
+#: finance/templates/finance/_entry_row.html:14
+msgid "I owe"
+msgstr "Je dois"
+
+#: finance/templates/finance/_entry_row.html:14
+#, python-format
+msgid "changed from %(amount)s"
+msgstr "modifié, était %(amount)s"
+
+#: finance/templates/finance/_entry_row.html:18
+#: finance/templates/finance/settings.html:44
+#, python-format
+msgid "Edit %(title)s"
+msgstr "Modifier %(title)s"
+
 #: finance/templates/finance/confirm_delete.html:4
-#: finance/templates/finance/confirm_delete.html:13
-#: finance/templates/finance/entry_form.html:72
-#: finance/templates/finance/goal_form.html:37
-#: finance/templates/finance/recurring_form.html:31
+#: finance/templates/finance/confirm_delete.html:15
+#: finance/templates/finance/entry_form.html:78
+#: finance/templates/finance/goal_form.html:39
+#: finance/templates/finance/recurring_form.html:33
+#: finance/templates/finance/savings.html:61
 msgid "Delete"
 msgstr "Supprimer"
 
-#: finance/templates/finance/confirm_delete.html:9
+#: finance/templates/finance/confirm_delete.html:11
 #, python-format
 msgid "Delete “%(name)s”?"
 msgstr "Supprimer « %(name)s » ?"
 
-#: finance/templates/finance/confirm_delete.html:10
+#: finance/templates/finance/confirm_delete.html:12
 msgid "This can't be undone."
 msgstr "Cette action est irréversible."
 
-#: finance/templates/finance/confirm_delete.html:12
-#: finance/templates/finance/entry_form.html:74
-#: finance/templates/finance/goal_form.html:39
-#: finance/templates/finance/goal_transfer.html:22
-#: finance/templates/finance/recurring_form.html:33
+#: finance/templates/finance/confirm_delete.html:14
+#: finance/templates/finance/entry_form.html:80
+#: finance/templates/finance/goal_form.html:41
+#: finance/templates/finance/goal_transfer.html:24
+#: finance/templates/finance/recurring_form.html:35
 msgid "Cancel"
 msgstr "Annuler"
 
 #: finance/templates/finance/cycle_form.html:4
-#: finance/templates/finance/cycle_form.html:11
-#: finance/templates/finance/settings.html:26
+#: finance/templates/finance/cycle_form.html:13
+#: finance/templates/finance/settings.html:28
 msgid "Start a new cycle"
 msgstr "Démarrer un nouveau cycle"
 
 #: finance/templates/finance/cycle_form.html:4
-#: finance/templates/finance/cycle_form.html:11
+#: finance/templates/finance/cycle_form.html:13
 msgid "Edit cycle"
 msgstr "Modifier le cycle"
 
-#: finance/templates/finance/cycle_form.html:7
-#: finance/templates/finance/entry_form.html:7
-#: finance/templates/finance/goal_form.html:7
-#: finance/templates/finance/goal_transfer.html:7
-#: finance/templates/finance/recurring_form.html:7
+#: finance/templates/finance/cycle_form.html:9
+#: finance/templates/finance/entry_form.html:9
+#: finance/templates/finance/goal_form.html:9
+#: finance/templates/finance/goal_transfer.html:9
+#: finance/templates/finance/recurring_form.html:9
 msgid "Back"
 msgstr "Retour"
 
-#: finance/templates/finance/cycle_form.html:12
+#: finance/templates/finance/cycle_form.html:14
 msgid "Usually from one payday to the next."
 msgstr "Généralement d'une paie à la suivante."
 
-#: finance/templates/finance/cycle_form.html:23
+#: finance/templates/finance/cycle_form.html:25
 msgid "Starts"
 msgstr "Début"
 
-#: finance/templates/finance/cycle_form.html:28
+#: finance/templates/finance/cycle_form.html:30
 msgid "Ends"
 msgstr "Fin"
 
-#: finance/templates/finance/cycle_form.html:42
+#: finance/templates/finance/cycle_form.html:44
 msgid "Added automatically"
 msgstr "Ajouté automatiquement"
 
-#: finance/templates/finance/cycle_form.html:48
+#: finance/templates/finance/cycle_form.html:50
 msgid ""
 "From your recurring expenses in Settings. You can edit them after starting."
 msgstr ""
 "Depuis vos dépenses récurrentes dans les Paramètres. Vous pourrez les "
 "modifier après le démarrage."
 
-#: finance/templates/finance/cycle_form.html:54
+#: finance/templates/finance/cycle_form.html:56
 msgid "How much do you want to save this cycle?"
 msgstr "Combien voulez-vous épargner ce cycle ?"
 
-#: finance/templates/finance/cycle_form.html:55
+#: finance/templates/finance/cycle_form.html:57
 msgid ""
 "This is moved from your balance into your goals. It counts as an expense, so"
 " it is never part of your free money."
@@ -196,34 +238,39 @@ msgstr ""
 "Cet argent passe de votre solde à vos objectifs. Il compte comme une "
 "dépense, il ne fait donc jamais partie de votre argent libre."
 
-#: finance/templates/finance/cycle_form.html:59
+#: finance/templates/finance/cycle_form.html:61
 #, python-format
 msgid "%(saved)s of %(target)s"
 msgstr "%(saved)s sur %(target)s"
 
-#: finance/templates/finance/cycle_form.html:67
+#: finance/templates/finance/cycle_form.html:69
 msgid "Start cycle"
 msgstr "Démarrer le cycle"
 
-#: finance/templates/finance/cycle_form.html:67
-#: finance/templates/finance/goal_form.html:41
-#: finance/templates/finance/recurring_form.html:35
+#: finance/templates/finance/cycle_form.html:69
+#: finance/templates/finance/goal_form.html:43
+#: finance/templates/finance/recurring_form.html:37
 msgid "Save"
 msgstr "Enregistrer"
 
-#: finance/templates/finance/dashboard.html:4 templates/base.html:35
+#: finance/templates/finance/dashboard.html:4
+#: finance/templates/finance/dashboard.html:44 templates/base.html:41
+#: templates/base.html:88
 msgid "Home"
 msgstr "Accueil"
 
-#: finance/templates/finance/dashboard.html:13
-msgid "Ask AI"
-msgstr "Demander à l'IA"
+#: finance/templates/finance/dashboard.html:11
+#: finance/templates/finance/dashboard.html:35
+#: finance/templates/finance/settings.html:4
+#: finance/templates/finance/settings.html:8 templates/base.html:49
+msgid "Settings"
+msgstr "Paramètres"
 
-#: finance/templates/finance/dashboard.html:20
+#: finance/templates/finance/dashboard.html:16
 msgid "Start your first cycle"
 msgstr "Démarrez votre premier cycle"
 
-#: finance/templates/finance/dashboard.html:21
+#: finance/templates/finance/dashboard.html:17
 msgid ""
 "Pick the dates between two paydays, add what comes in and what has to go "
 "out, and va8ti tells you how much you can freely spend each day."
@@ -232,246 +279,272 @@ msgstr ""
 "sortir, et va8ti vous dit combien vous pouvez dépenser librement chaque "
 "jour."
 
-#: finance/templates/finance/dashboard.html:22
+#: finance/templates/finance/dashboard.html:18
 msgid "Start a cycle"
 msgstr "Démarrer un cycle"
 
 #: finance/templates/finance/dashboard.html:28
+#: finance/templates/finance/dashboard.html:45
+#, python-format
+msgid "Day %(day)s of %(total)s"
+msgstr "Jour %(day)s sur %(total)s"
+
+#: finance/templates/finance/dashboard.html:32
+#: finance/templates/finance/dashboard.html:50
+msgid "Ask AI"
+msgstr "Demander à l'IA"
+
+#: finance/templates/finance/dashboard.html:54
+#: finance/templates/finance/dashboard.html:180 templates/base.html:119
+msgid "Not sure yet"
+msgstr "Pas encore sûr"
+
+#: finance/templates/finance/dashboard.html:60
 msgid "AI Financial Insights"
 msgstr "Analyse financière IA"
 
-#: finance/templates/finance/dashboard.html:29
+#: finance/templates/finance/dashboard.html:61 templates/base.html:105
 msgid "Close"
 msgstr "Fermer"
 
-#: finance/templates/finance/dashboard.html:36
-#: finance/templates/finance/entry_form.html:65
+#: finance/templates/finance/dashboard.html:67
+#: finance/templates/finance/entry_form.html:71
+#: finance/templates/finance/entry_form.html:95
 msgid "Free money"
 msgstr "Argent libre"
 
-#: finance/templates/finance/dashboard.html:39
-msgid "Free to spend per day"
-msgstr "Libre à dépenser par jour"
+#: finance/templates/finance/dashboard.html:70
+msgid "You can spend today"
+msgstr "Vous pouvez dépenser aujourd'hui"
 
-#: finance/templates/finance/dashboard.html:44
+#: finance/templates/finance/dashboard.html:75
 #, python-format
-msgid "%(amount)s / day if pending comes through"
-msgstr "%(amount)s / jour si les montants en attente arrivent"
+msgid "%(amount)s if pending comes through"
+msgstr "%(amount)s si les montants en attente arrivent"
 
-#: finance/templates/finance/dashboard.html:55
+#: finance/templates/finance/dashboard.html:86
 msgid "day left"
 msgid_plural "days left"
 msgstr[0] "jour restant"
 msgstr[1] "jours restants"
 
-#: finance/templates/finance/dashboard.html:61
+#: finance/templates/finance/dashboard.html:91
+#: finance/templates/finance/dashboard.html:97
 msgid "Free money this cycle"
 msgstr "Argent libre ce cycle"
 
-#: finance/templates/finance/dashboard.html:66
-#: finance/templates/finance/entry_form.html:4
-#: finance/templates/finance/entry_form.html:76
-#: finance/templates/finance/settings.html:32
-msgid "Add"
-msgstr "Ajouter"
+#: finance/templates/finance/dashboard.html:99
+msgid "Income minus expenses you're sure of"
+msgstr "Revenus moins dépenses certaines"
 
-#: finance/templates/finance/dashboard.html:77
-msgid "Not sure yet"
-msgstr "Pas encore sûr"
+#: finance/templates/finance/dashboard.html:103
+#: finance/templates/finance/dashboard.html:144
+#: finance/templates/finance/dashboard.html:149
+msgid "In"
+msgstr "Entrées"
 
-#: finance/templates/finance/dashboard.html:83
+#: finance/templates/finance/dashboard.html:104
+#: finance/templates/finance/dashboard.html:145
+#: finance/templates/finance/dashboard.html:161
+msgid "Out"
+msgstr "Sorties"
+
+#: finance/templates/finance/dashboard.html:106
+#, python-format
+msgid "%(percent)s%% of income already planned"
+msgstr "%(percent)s%% des revenus déjà prévus"
+
+#: finance/templates/finance/dashboard.html:113
+msgid "To receive"
+msgstr "À recevoir"
+
+#: finance/templates/finance/dashboard.html:117
+#: finance/templates/finance/dashboard.html:125
+#, python-format
+msgid "%(done)s of %(total)s"
+msgstr "%(done)s sur %(total)s"
+
+#: finance/templates/finance/dashboard.html:121
+msgid "To pay"
+msgstr "À payer"
+
+#: finance/templates/finance/dashboard.html:130
+msgid "Not sure"
+msgstr "Pas sûr"
+
+#: finance/templates/finance/dashboard.html:132
+#, python-format
+msgid "%(n)s item"
+msgid_plural "%(n)s items"
+msgstr[0] "%(n)s élément"
+msgstr[1] "%(n)s éléments"
+
+#: finance/templates/finance/dashboard.html:140
+#: finance/templates/finance/dashboard.html:143
 msgid "This cycle's plan"
 msgstr "Le plan de ce cycle"
 
-#: finance/templates/finance/dashboard.html:84
-msgid "Tap any amount to edit"
-msgstr "Touchez un montant pour le modifier"
+#: finance/templates/finance/dashboard.html:141
+msgid "Click any amount to edit"
+msgstr "Cliquez sur un montant pour le modifier"
 
-#: finance/templates/finance/dashboard.html:88
-msgid "Expenses"
-msgstr "Dépenses"
+#: finance/templates/finance/dashboard.html:151
+#, python-format
+msgid "To receive · %(amount)s"
+msgstr "À recevoir · %(amount)s"
 
-#: finance/templates/finance/dashboard.html:96
-msgid "Mark as not done"
-msgstr "Marquer comme non fait"
+#: finance/templates/finance/dashboard.html:155
+#, python-format
+msgid "Received · %(amount)s"
+msgstr "Reçu · %(amount)s"
 
-#: finance/templates/finance/dashboard.html:96
-msgid "Mark as received"
-msgstr "Marquer comme reçu"
+#: finance/templates/finance/dashboard.html:158
+msgid "No income planned yet."
+msgstr "Aucun revenu prévu pour l'instant."
 
-#: finance/templates/finance/dashboard.html:96
-msgid "Mark as paid"
-msgstr "Marquer comme payé"
+#: finance/templates/finance/dashboard.html:163
+#, python-format
+msgid "To pay · %(amount)s"
+msgstr "À payer · %(amount)s"
 
-#: finance/templates/finance/dashboard.html:101
-msgid "From savings"
-msgstr "Depuis l'épargne"
+#: finance/templates/finance/dashboard.html:167
+#, python-format
+msgid "Paid · %(amount)s"
+msgstr "Payé · %(amount)s"
 
-#: finance/templates/finance/dashboard.html:101
-msgid "To savings"
-msgstr "Vers l'épargne"
+#: finance/templates/finance/dashboard.html:170
+msgid "No expenses planned yet."
+msgstr "Aucune dépense prévue pour l'instant."
 
-#: finance/templates/finance/dashboard.html:103
-msgid "Owed to me"
-msgstr "On me doit"
+#: finance/templates/finance/dashboard.html:181
+#, python-format
+msgid "%(amount)s if all happen"
+msgstr "%(amount)s si tout se confirme"
 
-#: finance/templates/finance/dashboard.html:103
-msgid "I owe"
-msgstr "Je dois"
-
-#: finance/templates/finance/dashboard.html:104
-msgid "Transferred"
-msgstr "Transféré"
-
-#: finance/templates/finance/dashboard.html:104
-#: finance/templates/finance/dashboard.html:137
+#: finance/templates/finance/dashboard.html:195
 msgid "Received"
 msgstr "Reçu"
 
-#: finance/templates/finance/dashboard.html:104
-msgid "Paid"
-msgstr "Payé"
-
-#: finance/templates/finance/dashboard.html:104
-msgid "Not received yet"
-msgstr "Pas encore reçu"
-
-#: finance/templates/finance/dashboard.html:104
-msgid "Not paid yet"
-msgstr "Pas encore payé"
-
-#: finance/templates/finance/dashboard.html:105
-#, python-format
-msgid "changed from %(amount)s"
-msgstr "modifié, était %(amount)s"
-
-#: finance/templates/finance/dashboard.html:108
-#: finance/templates/finance/settings.html:42
-#, python-format
-msgid "Edit %(title)s"
-msgstr "Modifier %(title)s"
-
-#: finance/templates/finance/dashboard.html:111
-msgid ""
-"Nothing planned yet. Add your income and the expenses you have to cover."
-msgstr ""
-"Rien de prévu pour l'instant. Ajoutez vos revenus et les dépenses à couvrir."
-
-#: finance/templates/finance/dashboard.html:122
-msgid "Not confirmed yet"
-msgstr "Pas encore confirmé"
-
-#: finance/templates/finance/dashboard.html:124
-msgid "Only counted in the “if pending comes through” amount."
-msgstr ""
-"Compté uniquement dans le montant « si les montants en attente arrivent »."
-
-#: finance/templates/finance/dashboard.html:139
+#: finance/templates/finance/dashboard.html:197
 msgid "It happened"
 msgstr "C'est arrivé"
 
-#: finance/templates/finance/dashboard.html:152
+#: finance/templates/finance/dashboard.html:207
 #, python-format
-msgid "%(amount)s %(currency)s saved"
-msgstr "%(amount)s %(currency)s épargnés"
+msgid "Savings · %(amount)s %(currency)s"
+msgstr "Épargne · %(amount)s %(currency)s"
 
-#: finance/templates/finance/dashboard.html:154
-#, python-format
-msgid "%(goals)s goal"
-msgid_plural "%(goals)s goals"
-msgstr[0] "%(goals)s objectif"
-msgstr[1] "%(goals)s objectifs"
+#: finance/templates/finance/dashboard.html:208
+msgid "See all"
+msgstr "Tout voir"
 
-#: finance/templates/finance/dashboard.html:154
-#, python-format
-msgid "%(amount)s this cycle"
-msgstr "%(amount)s ce cycle"
+#: finance/templates/finance/dashboard.html:216
+#: finance/templates/finance/savings.html:80
+msgid "No goals yet. Create one to start saving towards it."
+msgstr "Aucun objectif pour l'instant. Créez-en un pour commencer à épargner."
 
-#: finance/templates/finance/dashboard.html:178
+#: finance/templates/finance/dashboard.html:245
 msgid "Thinking..."
 msgstr "Réflexion..."
 
-#: finance/templates/finance/dashboard.html:182
-#: finance/templates/finance/dashboard.html:186
+#: finance/templates/finance/dashboard.html:251
+#: finance/templates/finance/dashboard.html:253
 msgid "Error. Try Again"
 msgstr "Erreur. Réessayez"
 
 #: finance/templates/finance/entry_form.html:4
-#: finance/templates/finance/settings.html:22
+#: finance/templates/finance/savings.html:60
+#: finance/templates/finance/settings.html:24
 msgid "Edit"
 msgstr "Modifier"
 
-#: finance/templates/finance/entry_form.html:11
+#: finance/templates/finance/entry_form.html:4
+#: finance/templates/finance/entry_form.html:82
+#: finance/templates/finance/settings.html:34 templates/base.html:54
+#: templates/base.html:91 templates/base.html:104
+msgid "Add"
+msgstr "Ajouter"
+
+#: finance/templates/finance/entry_form.html:14
 msgid "Add to this cycle"
 msgstr "Ajouter à ce cycle"
 
-#: finance/templates/finance/entry_form.html:22
-#: finance/templates/finance/recurring_form.html:15
-msgid "What is it?"
-msgstr "De quoi s'agit-il ?"
-
-#: finance/templates/finance/entry_form.html:34
-#, python-format
-msgid "Was %(amount)s · you can change it any time during the cycle"
-msgstr "Était %(amount)s · modifiable à tout moment pendant le cycle"
-
-#: finance/templates/finance/entry_form.html:36
-msgid "You can change it any time during the cycle."
-msgstr "Modifiable à tout moment pendant le cycle."
-
-#: finance/templates/finance/entry_form.html:44
+#: finance/templates/finance/entry_form.html:30
 msgid "Probable and uncertain items are kept aside until you confirm them."
 msgstr ""
 "Les éléments probables et incertains sont mis de côté jusqu'à ce que vous "
 "les confirmiez."
 
-#: finance/templates/finance/entry_form.html:49
+#: finance/templates/finance/entry_form.html:34
+#: finance/templates/finance/recurring_form.html:17
+msgid "What is it?"
+msgstr "De quoi s'agit-il ?"
+
+#: finance/templates/finance/entry_form.html:48
+#, python-format
+msgid "Was %(amount)s · you can change it any time during the cycle"
+msgstr "Était %(amount)s · modifiable à tout moment pendant le cycle"
+
+#: finance/templates/finance/entry_form.html:50
+msgid "You can change it any time during the cycle."
+msgstr "Modifiable à tout moment pendant le cycle."
+
+#: finance/templates/finance/entry_form.html:55
 msgid "Already received or paid"
 msgstr "Déjà reçu ou payé"
 
-#: finance/templates/finance/entry_form.html:54
+#: finance/templates/finance/entry_form.html:59
 msgid "It's a debt (I owe it, or it's owed to me)"
 msgstr "C'est une dette (je la dois, ou on me la doit)"
 
-#: finance/templates/finance/entry_form.html:76
+#: finance/templates/finance/entry_form.html:82
 msgid "Save change"
 msgstr "Enregistrer"
 
-#: finance/templates/finance/entry_form.html:109
+#: finance/templates/finance/entry_form.html:88
+msgid "What this change does"
+msgstr "L'effet de ce changement"
+
+#: finance/templates/finance/entry_form.html:92
+#: finance/templates/finance/entry_form.html:136
 msgid "/ day"
 msgstr "/ jour"
+
+#: finance/templates/finance/entry_form.html:98
+msgid "Change the amount to see the effect on your day."
+msgstr "Modifiez le montant pour voir l'effet sur votre journée."
 
 #: finance/templates/finance/goal_form.html:4
 msgid "Savings goal"
 msgstr "Objectif d'épargne"
 
-#: finance/templates/finance/goal_form.html:11
+#: finance/templates/finance/goal_form.html:13
 msgid "New savings goal"
 msgstr "Nouvel objectif d'épargne"
 
-#: finance/templates/finance/goal_form.html:14
+#: finance/templates/finance/goal_form.html:16
 msgid "What are you saving for?"
 msgstr "Pour quoi épargnez-vous ?"
 
-#: finance/templates/finance/goal_form.html:19
+#: finance/templates/finance/goal_form.html:21
 msgid "Target amount"
 msgstr "Montant visé"
 
-#: finance/templates/finance/goal_form.html:26
+#: finance/templates/finance/goal_form.html:28
 msgid "Suggested each time you start a new cycle. You can change it then."
 msgstr ""
 "Proposé à chaque nouveau cycle. Vous pourrez le modifier à ce moment-là."
 
-#: finance/templates/finance/goal_form.html:30
+#: finance/templates/finance/goal_form.html:32
 msgid "Deadline (optional)"
 msgstr "Échéance (optionnelle)"
 
-#: finance/templates/finance/goal_transfer.html:11
+#: finance/templates/finance/goal_transfer.html:13
 #, python-format
 msgid "Add money to %(name)s"
 msgstr "Ajouter de l'argent à %(name)s"
 
-#: finance/templates/finance/goal_transfer.html:12
+#: finance/templates/finance/goal_transfer.html:14
 msgid ""
 "This moves money out of your balance: it shows as an expense in the current "
 "cycle."
@@ -479,13 +552,13 @@ msgstr ""
 "Cet argent sort de votre solde : il apparaît comme une dépense dans le cycle"
 " en cours."
 
-#: finance/templates/finance/goal_transfer.html:17
+#: finance/templates/finance/goal_transfer.html:19
 #, python-format
 msgid "Saved so far: %(saved)s of %(target)s"
 msgstr "Épargné jusqu'ici : %(saved)s sur %(target)s"
 
-#: finance/templates/finance/goal_transfer.html:23
-#: finance/templates/finance/savings.html:75
+#: finance/templates/finance/goal_transfer.html:25
+#: finance/templates/finance/savings.html:76
 msgid "Add money"
 msgstr "Ajouter de l'argent"
 
@@ -518,21 +591,22 @@ msgstr "Besoin d'un compte ? S'inscrire"
 msgid "Recurring expense"
 msgstr "Dépense récurrente"
 
-#: finance/templates/finance/recurring_form.html:11
+#: finance/templates/finance/recurring_form.html:13
 msgid "New recurring expense"
 msgstr "Nouvelle dépense récurrente"
 
-#: finance/templates/finance/recurring_form.html:12
+#: finance/templates/finance/recurring_form.html:14
 msgid "A fixed bill (e.g. rent, internet) copied into every new cycle."
 msgstr ""
 "Une facture fixe (ex. loyer, internet) copiée dans chaque nouveau cycle."
 
-#: finance/templates/finance/recurring_form.html:25
+#: finance/templates/finance/recurring_form.html:27
 msgid "Active (include in the next cycle)"
 msgstr "Active (incluse dans le prochain cycle)"
 
 #: finance/templates/finance/savings.html:4
-#: finance/templates/finance/savings.html:9 templates/base.html:39
+#: finance/templates/finance/savings.html:9 templates/base.html:45
+#: templates/base.html:97
 msgid "Savings"
 msgstr "Épargne"
 
@@ -540,25 +614,30 @@ msgstr "Épargne"
 msgid "New goal"
 msgstr "Nouvel objectif"
 
-#: finance/templates/finance/savings.html:18
+#: finance/templates/finance/savings.html:17
 msgid "Total saved"
 msgstr "Total épargné"
 
-#: finance/templates/finance/savings.html:22
-msgid "Savings over time and projection"
-msgstr "Épargne dans le temps et projection"
-
-#: finance/templates/finance/savings.html:23
-msgid "Today"
-msgstr "Aujourd'hui"
-
-#: finance/templates/finance/savings.html:25
+#: finance/templates/finance/savings.html:21
 msgid "Saved"
 msgstr "Épargné"
 
-#: finance/templates/finance/savings.html:26
+#: finance/templates/finance/savings.html:22
 msgid "Projection"
 msgstr "Projection"
+
+#: finance/templates/finance/savings.html:23
+#: finance/templates/finance/savings.html:89
+msgid "Goal"
+msgstr "Objectif"
+
+#: finance/templates/finance/savings.html:26
+msgid "Savings over time and projection"
+msgstr "Épargne dans le temps et projection"
+
+#: finance/templates/finance/savings.html:27
+msgid "Today"
+msgstr "Aujourd'hui"
 
 #: finance/templates/finance/savings.html:31
 msgid "Where could this take you?"
@@ -596,96 +675,87 @@ msgstr "2 ans"
 msgid "5 years"
 msgstr "5 ans"
 
-#: finance/templates/finance/savings.html:56
-msgid "Goals"
-msgstr "Objectifs"
-
-#: finance/templates/finance/savings.html:61
+#: finance/templates/finance/savings.html:64
 #, python-format
-msgid "%(saved)s / %(target)s"
-msgstr "%(saved)s / %(target)s"
+msgid "of %(target)s · %(percent)s%%"
+msgstr "sur %(target)s · %(percent)s%%"
 
-#: finance/templates/finance/savings.html:65
+#: finance/templates/finance/savings.html:67
 #, python-format
 msgid "%(amount)s / month"
 msgstr "%(amount)s / mois"
 
-#: finance/templates/finance/savings.html:65
+#: finance/templates/finance/savings.html:67
 msgid "No monthly amount"
 msgstr "Aucun montant mensuel"
 
-#: finance/templates/finance/savings.html:67
+#: finance/templates/finance/savings.html:69
 msgid "Goal reached"
 msgstr "Objectif atteint"
 
-#: finance/templates/finance/savings.html:69
+#: finance/templates/finance/savings.html:71
 #, python-format
 msgid "Done %(date)s"
 msgstr "Atteint en %(date)s"
 
-#: finance/templates/finance/savings.html:71
+#: finance/templates/finance/savings.html:73
 msgid "Set one"
 msgstr "En définir un"
 
-#: finance/templates/finance/savings.html:79
-msgid "No goals yet. Create one to start saving towards it."
-msgstr "Aucun objectif pour l'instant. Créez-en un pour commencer à épargner."
-
-#: finance/templates/finance/savings.html:85
+#: finance/templates/finance/savings.html:87
 msgid "History"
 msgstr "Historique"
 
-#: finance/templates/finance/savings.html:163
+#: finance/templates/finance/savings.html:89
+msgid "Date"
+msgstr "Date"
+
+#: finance/templates/finance/savings.html:170
 msgid "By"
 msgstr "D'ici"
 
-#: finance/templates/finance/savings.html:163
+#: finance/templates/finance/savings.html:170
 msgid "you would have"
 msgstr "vous auriez"
 
-#: finance/templates/finance/savings.html:168
+#: finance/templates/finance/savings.html:175
 msgid "Goals reached:"
 msgstr "Objectifs atteints :"
 
-#: finance/templates/finance/settings.html:4
-#: finance/templates/finance/settings.html:8 templates/base.html:43
-msgid "Settings"
-msgstr "Paramètres"
-
-#: finance/templates/finance/settings.html:13
+#: finance/templates/finance/settings.html:15
 msgid "Cycle"
 msgstr "Cycle"
 
-#: finance/templates/finance/settings.html:31
+#: finance/templates/finance/settings.html:33
 msgid "Recurring expenses"
 msgstr "Dépenses récurrentes"
 
-#: finance/templates/finance/settings.html:34
+#: finance/templates/finance/settings.html:36
 msgid "Copied into every new cycle, like rent or internet."
 msgstr "Copiées dans chaque nouveau cycle, comme le loyer ou internet."
 
-#: finance/templates/finance/settings.html:40
+#: finance/templates/finance/settings.html:42
 msgid "Paused"
 msgstr "En pause"
 
-#: finance/templates/finance/settings.html:45
+#: finance/templates/finance/settings.html:47
 msgid "No recurring expenses yet."
 msgstr "Aucune dépense récurrente pour l'instant."
 
-#: finance/templates/finance/settings.html:51
+#: finance/templates/finance/settings.html:53
 msgid "Language"
 msgstr "Langue"
 
-#: finance/templates/finance/settings.html:62
+#: finance/templates/finance/settings.html:64
 msgid "Account"
 msgstr "Compte"
 
-#: finance/templates/finance/settings.html:63
+#: finance/templates/finance/settings.html:65 templates/base.html:65
 #, python-format
 msgid "Signed in as %(name)s"
 msgstr "Connecté en tant que %(name)s"
 
-#: finance/templates/finance/settings.html:66
+#: finance/templates/finance/settings.html:68 templates/base.html:66
 msgid "Log out"
 msgstr "Se déconnecter"
 
@@ -714,10 +784,39 @@ msgstr "Anglais"
 msgid "French"
 msgstr "Français"
 
-#: templates/base.html:32
+#: templates/base.html:29 templates/base.html:85
 msgid "Main"
 msgstr "Principal"
 
-#: templates/base.html:51
+#: templates/base.html:33
+msgid "Current cycle"
+msgstr "Cycle en cours"
+
+#: templates/base.html:78
 msgid "© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed."
 msgstr "© 2025 Va8ti. Conçu & Réalisé par Souleimane Cheikh ahmed."
+
+#: templates/base.html:104
+#, python-format
+msgid "Add to %(name)s"
+msgstr "Ajouter à %(name)s"
+
+#: templates/base.html:111
+msgid "Money coming in: salary, someone paying you back"
+msgstr "Argent qui rentre : salaire, quelqu'un qui vous rembourse"
+
+#: templates/base.html:115
+msgid "Money you have to cover: rent, bills, debts"
+msgstr "Argent à couvrir : loyer, factures, dettes"
+
+#: templates/base.html:119
+msgid "Might happen: kept aside until you confirm it"
+msgstr "Peut arriver : mis de côté jusqu'à confirmation"
+
+#: templates/base.html:123
+msgid "Save toward a goal"
+msgstr "Épargner pour un objectif"
+
+#: templates/base.html:123
+msgid "Move money from your balance into a savings goal"
+msgstr "Transférer de l'argent de votre solde vers un objectif d'épargne"

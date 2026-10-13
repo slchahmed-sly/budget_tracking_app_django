@@ -3,6 +3,8 @@
 
 {% block title %}{% if is_new %}{% trans "Start a new cycle" %}{% else %}{% trans "Edit cycle" %}{% endif %}{% endblock %}
 
+{% block body_class %}is-form{% endblock %}
+
 {% block content %}
 <a href="{% if is_new %}{% url 'home' %}{% else %}{% url 'settings' %}{% endif %}" class="back-link">← {% trans "Back" %}</a>
 

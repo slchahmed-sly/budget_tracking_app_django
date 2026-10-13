@@ -15,19 +15,64 @@ from .models import Entry
 RING_CIRCUMFERENCE = 276.46  # 2 * pi * 44, the radius used by the days ring
 
 
+MAX_PROGRESS_DOTS = 10
+
+
+@dataclass
+class Side:
+    """The certain entries going one way (in or out), split by whether
+    they have been received/paid yet. Ticking only changes this split,
+    never the free money."""
+    total: int
+    open: list
+    done: list
+
+    @property
+    def open_total(self):
+        return sum(e.amount for e in self.open)
+
+    @property
+    def done_total(self):
+        return sum(e.amount for e in self.done)
+
+    @property
+    def count(self):
+        return len(self.open) + len(self.done)
+
+    @property
+    def dots(self):
+        """One dot per item, ticked ones first; empty when there are too many to draw."""
+        if self.count > MAX_PROGRESS_DOTS:
+            return []
+        return [True] * len(self.done) + [False] * len(self.open)
+
+
 @dataclass
 class CycleSummary:
     total_days: int
     days_left: int
+    day_number: int
     income: int
     expenses: int
     free_money: int
     per_day: int
     pending_net: int
     potential_per_day: int
+    planned_percent: int
     ring_dash: float
+    incoming: Side
+    outgoing: Side
     certain_entries: list = field(default_factory=list)
     pending_entries: list = field(default_factory=list)
+
+
+def _side(entries):
+    by_size = sorted(entries, key=lambda e: -e.amount)
+    return Side(
+        total=sum(e.amount for e in entries),
+        open=[e for e in by_size if not e.is_done],
+        done=[e for e in by_size if e.is_done],
+    )
 
 
 def summarize(cycle, today=None):
@@ -39,21 +84,25 @@ def summarize(cycle, today=None):
     certain = [e for e in entries if e.is_certain]
     pending = [e for e in entries if not e.is_certain]
 
-    income = sum(e.amount for e in certain if e.is_income)
-    expenses = sum(e.amount for e in certain if not e.is_income)
-    free_money = income - expenses
+    incoming = _side([e for e in certain if e.is_income])
+    outgoing = _side([e for e in certain if not e.is_income])
+    free_money = incoming.total - outgoing.total
     pending_net = sum(e.signed_amount for e in pending)
 
     return CycleSummary(
         total_days=total_days,
         days_left=days_left,
-        income=income,
-        expenses=expenses,
+        day_number=total_days - days_left + 1,
+        income=incoming.total,
+        expenses=outgoing.total,
         free_money=free_money,
         per_day=round(free_money / days_left),
         pending_net=pending_net,
         potential_per_day=round((free_money + pending_net) / days_left),
+        planned_percent=round(outgoing.total * 100 / incoming.total) if incoming.total else 0,
         ring_dash=round(RING_CIRCUMFERENCE * days_left / total_days, 1),
+        incoming=incoming,
+        outgoing=outgoing,
         certain_entries=sorted(certain, key=lambda e: (not e.is_income, -e.amount)),
         pending_entries=sorted(pending, key=lambda e: (not e.is_income, -e.amount)),
     )

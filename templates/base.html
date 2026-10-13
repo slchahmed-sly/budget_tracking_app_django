@@ -21,36 +21,119 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'app.css' %}">
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
     {% block body %}
-    <main class="app {% block app_class %}{% endblock %}">
-        {% block content %}{% endblock %}
-    </main>
+    {% with page=request.resolver_match.url_name %}
+    <div class="shell">
+        {% if user.is_authenticated %}
+        <aside class="sidebar" aria-label="{% trans 'Main' %}">
+            <a href="{% url 'home' %}" class="logo"><img src="{% static 'icons/icon.svg' %}" alt="" width="32" height="32">va8ti</a>
+            {% if active_cycle %}
+            <a href="{% url 'settings' %}" class="cycle-box">
+                <small>{% trans "Current cycle" %}</small>
+                <strong>{{ active_cycle.title }}</strong>
+                <span>{{ active_cycle.start|date:"j M" }} – {{ active_cycle.end|date:"j M" }} · {{ active_cycle.currency_symbol }}</span>
+            </a>
+            {% endif %}
+            <nav class="side-nav">
+                <a href="{% url 'home' %}" {% if page == 'home' %}aria-current="page"{% endif %}>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+                    {% trans "Home" %}
+                </a>
+                <a href="{% url 'savings' %}" {% if page == 'savings' %}aria-current="page"{% endif %}>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>
+                    {% trans "Savings" %}
+                </a>
+                <a href="{% url 'settings' %}" {% if page == 'settings' %}aria-current="page"{% endif %}>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+                    {% trans "Settings" %}
+                </a>
+            </nav>
+            <button type="button" class="btn btn-primary btn-block" data-open-add>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                {% trans "Add" %}
+            </button>
+            <div class="side-foot">
+                <form action="{% url 'set_language' %}" method="post" class="lang-switch lang-switch--small">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ request.path }}">
+                    <button type="submit" name="language" value="en" aria-pressed="{% if LANGUAGE_CODE == 'en' %}true{% else %}false{% endif %}">EN</button>
+                    <button type="submit" name="language" value="fr" aria-pressed="{% if LANGUAGE_CODE == 'fr' %}true{% else %}false{% endif %}">FR</button>
+                </form>
+                <form method="post" action="{% url 'logout' %}" class="side-account">
+                    {% csrf_token %}
+                    <span>{% blocktrans with name=user.username %}Signed in as {{ name }}{% endblocktrans %}</span>
+                    <button type="submit" class="link-button">{% trans "Log out" %}</button>
+                </form>
+            </div>
+        </aside>
+        {% endif %}
+
+        <div class="shell-main">
+            <main class="app {% block app_class %}{% endblock %}">
+                {% block content %}{% endblock %}
+            </main>
+            <footer class="footer">
+                {% block footer_content %}
+                <p>{% trans "© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed." %}</p>
+                {% endblock %}
+            </footer>
+        </div>
+    </div>
 
     {% if user.is_authenticated %}
-    {% block nav %}
     <nav class="nav" aria-label="{% trans 'Main' %}">
-        <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>
+        <a href="{% url 'home' %}" {% if page == 'home' %}aria-current="page"{% endif %}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
             {% trans "Home" %}
         </a>
-        <a href="{% url 'savings' %}" {% if request.resolver_match.url_name == 'savings' %}aria-current="page"{% endif %}>
+        <div class="nav-add">
+            <button type="button" data-open-add aria-label="{% trans 'Add' %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+        </div>
+        <a href="{% url 'savings' %}" {% if page == 'savings' %}aria-current="page"{% endif %}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>
             {% trans "Savings" %}
         </a>
-        <a href="{% url 'settings' %}" {% if request.resolver_match.url_name == 'settings' %}aria-current="page"{% endif %}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
-            {% trans "Settings" %}
-        </a>
     </nav>
-    {% endblock %}
-    {% endif %}
 
-    <footer class="footer">
-        {% block footer_content %}
-        <p>{% trans "© 2025 Va8ti. Designed & Built by Souleimane Cheikh ahmed." %}</p>
-        {% endblock %}
-    </footer>
+    <dialog class="add-sheet" id="addSheet" aria-labelledby="addSheetTitle">
+        <div class="add-sheet-handle" aria-hidden="true"></div>
+        <div class="add-sheet-head">
+            <h2 id="addSheetTitle">{% if active_cycle %}{% blocktrans with name=active_cycle.title %}Add to {{ name }}{% endblocktrans %}{% else %}{% trans "Add" %}{% endif %}</h2>
+            <button type="button" class="add-sheet-close" data-close-add aria-label="{% trans 'Close' %}">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+        </div>
+        <a href="{% url 'add_entry' %}?kind=income" class="add-choice add-choice--income">
+            <span class="add-choice-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
+            <span><b>{% trans "Income" %}</b><small>{% trans "Money coming in: salary, someone paying you back" %}</small></span>
+        </a>
+        <a href="{% url 'add_entry' %}?kind=expense" class="add-choice add-choice--expense">
+            <span class="add-choice-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></span>
+            <span><b>{% trans "Expense" %}</b><small>{% trans "Money you have to cover: rent, bills, debts" %}</small></span>
+        </a>
+        <a href="{% url 'add_entry' %}?certainty=probable" class="add-choice add-choice--pending">
+            <span class="add-choice-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg></span>
+            <span><b>{% trans "Not sure yet" %}</b><small>{% trans "Might happen: kept aside until you confirm it" %}</small></span>
+        </a>
+        <a href="{% url 'savings' %}" class="add-choice add-choice--save">
+            <span class="add-choice-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg></span>
+            <span><b>{% trans "Save toward a goal" %}</b><small>{% trans "Move money from your balance into a savings goal" %}</small></span>
+        </a>
+    </dialog>
+    <script>
+    (function () {
+        const sheet = document.getElementById('addSheet');
+        if (!sheet || !sheet.showModal) return;
+        document.querySelectorAll('[data-open-add]').forEach((b) => b.addEventListener('click', () => sheet.showModal()));
+        sheet.querySelector('[data-close-add]').addEventListener('click', () => sheet.close());
+        sheet.addEventListener('click', (event) => { if (event.target === sheet) sheet.close(); });
+    })();
+    </script>
+    {% endif %}
+    {% endwith %}
     {% endblock %}
 
     {% block scripts %}{% endblock %}
